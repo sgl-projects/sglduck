@@ -6,7 +6,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include"panic.h"
+#include"sgl_error.h"
 #include "cgs.h"
 #include "aes.h"
 #include "geom.h"
@@ -75,7 +75,7 @@ geom_expr: UNQUOTED_STRING UNQUOTED_STRING {
 	if (!valid_qual_str(qual_str)) {
 		print_result = asprintf(errmsg, "Invalid geom qualifier: %s\n", qual_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
@@ -87,7 +87,7 @@ geom_expr: UNQUOTED_STRING UNQUOTED_STRING {
 	if (!valid_geom_str(geom_str)) {
 		print_result = asprintf(errmsg, "Invalid geom name: %s\n", geom_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -108,7 +108,7 @@ geom_expr: UNQUOTED_STRING UNQUOTED_STRING {
 	if (!valid_geom_str(geom_str)) {
 		print_result = asprintf(errmsg, "Invalid geom name: %s\n", geom_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -133,7 +133,7 @@ from_clause: FROM TABLE_NAME {
 	int print_result;
 	print_result = asprintf(&(cgs->layers->source_sql_query), "select * from %s", table_name);
 	if(print_result == -1) {
-		sgl_panic("Memory allocation failed.");
+		sgl_error("Memory allocation failed.");
 	}
 	free(table_name);
 } | FROM SQL_SUBQUERY {
@@ -152,7 +152,7 @@ aes_mapping: col_expr AS UNQUOTED_STRING {
 	if (!valid_aes_str(aes_str)) {
 		print_result = asprintf(errmsg, "Invalid aesthetic name: %s\n", aes_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -174,7 +174,7 @@ col_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')' {
 	if (!valid_cta_str(cta_str)) {
 		print_result = asprintf(errmsg, "Invalid CTA: %s\n", cta_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
@@ -195,7 +195,7 @@ col_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')' {
 	if (!valid_cta_str(cta_str)) {
 		print_result = asprintf(errmsg, "Invalid CTA: %s\n", cta_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
@@ -275,14 +275,14 @@ scale_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')' {
 	if (!valid_scale_str(scale_str)) {
 		print_result = asprintf(errmsg, "Invalid scale type: %s\n", scale_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
 	if (!valid_aes_str(aes_str)) {
 		print_result = asprintf(errmsg, "Invalid aesthetic name: %s\n", aes_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -336,7 +336,7 @@ title_expr: UNQUOTED_STRING AS SINGLE_QUOTED_STRING {
 	if (!valid_aes_str(aes_str)) {
 		print_result = asprintf(errmsg, "Invalid aesthetic name: %s\n", aes_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -401,6 +401,6 @@ void yyerror(struct cgs *cgs, char **errmsg, char const *s) {
 	int print_result;
 	print_result = asprintf(errmsg, "%s\n", s);
 	if(print_result == -1) {
-		sgl_panic("Memory allocation failed.");
+		sgl_error("Memory allocation failed.");
 	}
 }

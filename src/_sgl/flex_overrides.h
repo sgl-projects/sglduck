@@ -1,5 +1,5 @@
-#include "panic.h"
-#define exit(status) sgl_panic("Fatal scanner error (exit code %d)", status)
+#include "sgl_error.h"
+#define exit(status) sgl_error("Fatal scanner error (exit code %d)", status)
 #undef stdout
 #undef stderr
 #define stdout NULL

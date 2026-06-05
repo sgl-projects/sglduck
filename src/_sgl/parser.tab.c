@@ -67,13 +67,13 @@
 
 
 /* First part of user prologue.  */
-#line 4 "parser.y"
+#line 4 "src/_sgl/parser.y"
 
 #define _GNU_SOURCE
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include"panic.h"
+#include"sgl_error.h"
 #include "cgs.h"
 #include "aes.h"
 #include "geom.h"
@@ -92,7 +92,7 @@ void yyerror(struct cgs *cgs, char **errmsg, char const *s);
 extern void yyrestart(FILE *input_file);
 
 
-#line 96 "parser.tab.c"
+#line 96 "src/_sgl/parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1190,7 +1190,7 @@ yyreduce:
   switch (yyn)
     {
   case 10: /* $@1: %empty  */
-#line 61 "parser.y"
+#line 61 "src/_sgl/parser.y"
                             {
 	struct layer *new_layer = malloc(sizeof(struct layer));
 	new_layer->aes_mappings=NULL;
@@ -1200,17 +1200,17 @@ yyreduce:
 	new_layer->next=cgs->layers;
 	cgs->layers=new_layer;
 }
-#line 1204 "parser.tab.c"
+#line 1204 "src/_sgl/parser.tab.c"
     break;
 
   case 11: /* layer_expression: VISUALIZE $@1 aes_mappings from_clause grouping_clause collection_clause using_clause  */
-#line 69 "parser.y"
+#line 69 "src/_sgl/parser.y"
                                                                           {}
-#line 1210 "parser.tab.c"
+#line 1210 "src/_sgl/parser.tab.c"
     break;
 
   case 12: /* geom_expr: UNQUOTED_STRING UNQUOTED_STRING  */
-#line 71 "parser.y"
+#line 71 "src/_sgl/parser.y"
                                            {
 	char *qual_str=(yyvsp[-1].str);
 	str_tolower(qual_str);	
@@ -1218,7 +1218,7 @@ yyreduce:
 	if (!valid_qual_str(qual_str)) {
 		print_result = asprintf(errmsg, "Invalid geom qualifier: %s\n", qual_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
@@ -1230,7 +1230,7 @@ yyreduce:
 	if (!valid_geom_str(geom_str)) {
 		print_result = asprintf(errmsg, "Invalid geom name: %s\n", geom_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -1243,11 +1243,11 @@ yyreduce:
 	new_geom->next = cgs->layers->geoms;
 	cgs->layers->geoms = new_geom;
 }
-#line 1247 "parser.tab.c"
+#line 1247 "src/_sgl/parser.tab.c"
     break;
 
   case 13: /* geom_expr: UNQUOTED_STRING  */
-#line 102 "parser.y"
+#line 102 "src/_sgl/parser.y"
                     {
 	enum qual qual=DEFAULT;
 	int print_result;
@@ -1257,7 +1257,7 @@ yyreduce:
 	if (!valid_geom_str(geom_str)) {
 		print_result = asprintf(errmsg, "Invalid geom name: %s\n", geom_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -1270,35 +1270,35 @@ yyreduce:
 	new_geom->next = cgs->layers->geoms;
 	cgs->layers->geoms = new_geom;
 }
-#line 1274 "parser.tab.c"
+#line 1274 "src/_sgl/parser.tab.c"
     break;
 
   case 18: /* from_clause: FROM TABLE_NAME  */
-#line 131 "parser.y"
+#line 131 "src/_sgl/parser.y"
                              {
 	char *table_name = (yyvsp[0].str);
 	int print_result;
 	print_result = asprintf(&(cgs->layers->source_sql_query), "select * from %s", table_name);
 	if(print_result == -1) {
-		sgl_panic("Memory allocation failed.");
+		sgl_error("Memory allocation failed.");
 	}
 	free(table_name);
 }
-#line 1288 "parser.tab.c"
+#line 1288 "src/_sgl/parser.tab.c"
     break;
 
   case 19: /* from_clause: FROM SQL_SUBQUERY  */
-#line 139 "parser.y"
+#line 139 "src/_sgl/parser.y"
                       {
 	char *sql_subquery=(yyvsp[0].str);
 	cgs->layers->source_sql_query=strdup(sql_subquery);
 	free(sql_subquery);
 }
-#line 1298 "parser.tab.c"
+#line 1298 "src/_sgl/parser.tab.c"
     break;
 
   case 22: /* aes_mapping: col_expr AS UNQUOTED_STRING  */
-#line 148 "parser.y"
+#line 148 "src/_sgl/parser.y"
                                          {
 	char *aes_str=(yyvsp[0].str);
 	str_tolower(aes_str);
@@ -1306,7 +1306,7 @@ yyreduce:
 	if (!valid_aes_str(aes_str)) {
 		print_result = asprintf(errmsg, "Invalid aesthetic name: %s\n", aes_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -1320,11 +1320,11 @@ yyreduce:
 
 	cgs->layers->aes_mappings=new_mapping;
 }
-#line 1324 "parser.tab.c"
+#line 1324 "src/_sgl/parser.tab.c"
     break;
 
   case 23: /* col_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')'  */
-#line 170 "parser.y"
+#line 170 "src/_sgl/parser.y"
                                                   {
 	char *cta_str=(yyvsp[-3].str);
 	str_tolower(cta_str);	
@@ -1332,7 +1332,7 @@ yyreduce:
 	if (!valid_cta_str(cta_str)) {
 		print_result = asprintf(errmsg, "Invalid CTA: %s\n", cta_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
@@ -1347,11 +1347,11 @@ yyreduce:
 	free(column_name);
 
 }
-#line 1351 "parser.tab.c"
+#line 1351 "src/_sgl/parser.tab.c"
     break;
 
   case 24: /* col_expr: UNQUOTED_STRING '(' UNQUOTED_STRING COMMA fn_arg ')'  */
-#line 191 "parser.y"
+#line 191 "src/_sgl/parser.y"
                                                          {
 	char *cta_str=(yyvsp[-5].str);
 	str_tolower(cta_str);	
@@ -1359,7 +1359,7 @@ yyreduce:
 	if (!valid_cta_str(cta_str)) {
 		print_result = asprintf(errmsg, "Invalid CTA: %s\n", cta_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
@@ -1374,11 +1374,11 @@ yyreduce:
 	free(column_name);
 
 }
-#line 1378 "parser.tab.c"
+#line 1378 "src/_sgl/parser.tab.c"
     break;
 
   case 25: /* col_expr: UNQUOTED_STRING  */
-#line 212 "parser.y"
+#line 212 "src/_sgl/parser.y"
                           {
 	enum cta cta=IDENTITY;
 	char *column_name=(yyvsp[0].str);
@@ -1390,11 +1390,11 @@ yyreduce:
 	free(column_name);
 
 }
-#line 1394 "parser.tab.c"
+#line 1394 "src/_sgl/parser.tab.c"
     break;
 
   case 26: /* fn_arg: INTEGER  */
-#line 224 "parser.y"
+#line 224 "src/_sgl/parser.y"
                 {
 	int value=(yyvsp[0].int_val);
 
@@ -1404,11 +1404,11 @@ yyreduce:
 
 	(yyval.fa)=new_arg;
 }
-#line 1408 "parser.tab.c"
+#line 1408 "src/_sgl/parser.tab.c"
     break;
 
   case 31: /* grouping_expr: col_expr  */
-#line 240 "parser.y"
+#line 240 "src/_sgl/parser.y"
                         {
 	struct grouping_expr *new_grouping_expr = malloc(sizeof(struct grouping_expr));
 
@@ -1417,11 +1417,11 @@ yyreduce:
 
 	cgs->layers->groupings=new_grouping_expr;
 }
-#line 1421 "parser.tab.c"
+#line 1421 "src/_sgl/parser.tab.c"
     break;
 
   case 36: /* collection_expr: col_expr  */
-#line 255 "parser.y"
+#line 255 "src/_sgl/parser.y"
                           {
 	struct collection_expr *new_collection_expr = malloc(sizeof(struct collection_expr));
 
@@ -1430,17 +1430,17 @@ yyreduce:
 
 	cgs->layers->collections=new_collection_expr;
 }
-#line 1434 "parser.tab.c"
+#line 1434 "src/_sgl/parser.tab.c"
     break;
 
   case 37: /* scale_clause: SCALE BY scale_list  */
-#line 264 "parser.y"
+#line 264 "src/_sgl/parser.y"
                                   {}
-#line 1440 "parser.tab.c"
+#line 1440 "src/_sgl/parser.tab.c"
     break;
 
   case 40: /* scale_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')'  */
-#line 269 "parser.y"
+#line 269 "src/_sgl/parser.y"
                                                     {
 	char *scale_str=(yyvsp[-3].str);
 	str_tolower(scale_str);
@@ -1450,14 +1450,14 @@ yyreduce:
 	if (!valid_scale_str(scale_str)) {
 		print_result = asprintf(errmsg, "Invalid scale type: %s\n", scale_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}
 	if (!valid_aes_str(aes_str)) {
 		print_result = asprintf(errmsg, "Invalid aesthetic name: %s\n", aes_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -1474,17 +1474,17 @@ yyreduce:
 	new_scale->next=cgs->scales;	
 	cgs->scales=new_scale;
 }
-#line 1478 "parser.tab.c"
+#line 1478 "src/_sgl/parser.tab.c"
     break;
 
   case 41: /* facet_clause: FACET BY facet_list  */
-#line 303 "parser.y"
+#line 303 "src/_sgl/parser.y"
                                   {}
-#line 1484 "parser.tab.c"
+#line 1484 "src/_sgl/parser.tab.c"
     break;
 
   case 44: /* facet_expr: UNQUOTED_STRING direction  */
-#line 308 "parser.y"
+#line 308 "src/_sgl/parser.y"
                                       {
 	char *column = (yyvsp[-1].str);
 	enum direction facet_direction = (yyvsp[0].direction_enum);
@@ -1498,35 +1498,35 @@ yyreduce:
 	new_facet->next=cgs->facets;
 	cgs->facets=new_facet;	
 }
-#line 1502 "parser.tab.c"
+#line 1502 "src/_sgl/parser.tab.c"
     break;
 
   case 45: /* direction: %empty  */
-#line 322 "parser.y"
+#line 322 "src/_sgl/parser.y"
            { (yyval.direction_enum) = DEFAULT_DIRECTION; }
-#line 1508 "parser.tab.c"
+#line 1508 "src/_sgl/parser.tab.c"
     break;
 
   case 46: /* direction: HORIZONTALLY  */
-#line 323 "parser.y"
+#line 323 "src/_sgl/parser.y"
                { (yyval.direction_enum) = HORIZONTAL_DIRECTION; }
-#line 1514 "parser.tab.c"
+#line 1514 "src/_sgl/parser.tab.c"
     break;
 
   case 47: /* direction: VERTICALLY  */
-#line 324 "parser.y"
+#line 324 "src/_sgl/parser.y"
              { (yyval.direction_enum) = VERTICAL_DIRECTION; }
-#line 1520 "parser.tab.c"
+#line 1520 "src/_sgl/parser.tab.c"
     break;
 
   case 48: /* title_clause: TITLE title_list  */
-#line 326 "parser.y"
+#line 326 "src/_sgl/parser.y"
                                {}
-#line 1526 "parser.tab.c"
+#line 1526 "src/_sgl/parser.tab.c"
     break;
 
   case 51: /* title_expr: UNQUOTED_STRING AS SINGLE_QUOTED_STRING  */
-#line 331 "parser.y"
+#line 331 "src/_sgl/parser.y"
                                                     {
 	char *aes_str=(yyvsp[-2].str);
 	str_tolower(aes_str);	
@@ -1535,7 +1535,7 @@ yyreduce:
 	if (!valid_aes_str(aes_str)) {
 		print_result = asprintf(errmsg, "Invalid aesthetic name: %s\n", aes_str);
 		if(print_result == -1) {
-			sgl_panic("Memory allocation failed.");
+			sgl_error("Memory allocation failed.");
 		}
 		YYERROR;
 	}	
@@ -1551,11 +1551,11 @@ yyreduce:
 	new_title->next=cgs->titles;	
 	cgs->titles=new_title;
 }
-#line 1555 "parser.tab.c"
+#line 1555 "src/_sgl/parser.tab.c"
     break;
 
 
-#line 1559 "parser.tab.c"
+#line 1559 "src/_sgl/parser.tab.c"
 
       default: break;
     }
@@ -1748,7 +1748,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 356 "parser.y"
+#line 356 "src/_sgl/parser.y"
 
 
 void reverse_layers(struct cgs *cgs) {
@@ -1797,6 +1797,6 @@ void yyerror(struct cgs *cgs, char **errmsg, char const *s) {
 	int print_result;
 	print_result = asprintf(errmsg, "%s\n", s);
 	if(print_result == -1) {
-		sgl_panic("Memory allocation failed.");
+		sgl_error("Memory allocation failed.");
 	}
 }

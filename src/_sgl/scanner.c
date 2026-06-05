@@ -1,6 +1,6 @@
-#line 1 "scanner.c"
+#line 1 "src/_sgl/scanner.c"
 
-#line 3 "scanner.c"
+#line 3 "src/_sgl/scanner.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -540,11 +540,11 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "scanner.l"
+#line 1 "src/_sgl/scanner.l"
 #define YY_NO_INPUT 1
 
 
-#line 11 "scanner.l"
+#line 11 "src/_sgl/scanner.l"
 #include "cgs.h"
 #include "parser.tab.h"
 #include "flex_overrides.h"
@@ -552,8 +552,8 @@ char *yytext;
 #define MAX_SUBQUERY_LEN 10000
 
 int unclosed_paren_count;
-#line 555 "scanner.c"
-#line 556 "scanner.c"
+#line 555 "src/_sgl/scanner.c"
+#line 556 "src/_sgl/scanner.c"
 
 #define INITIAL 0
 #define FROM_CONTENT 1
@@ -770,10 +770,10 @@ YY_DECL
 		}
 
 	{
-#line 20 "scanner.l"
+#line 20 "src/_sgl/scanner.l"
 
 
-#line 776 "scanner.c"
+#line 776 "src/_sgl/scanner.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -832,77 +832,77 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 22 "scanner.l"
+#line 22 "src/_sgl/scanner.l"
 { return VISUALIZE; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 23 "scanner.l"
+#line 23 "src/_sgl/scanner.l"
 { return AS; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 24 "scanner.l"
+#line 24 "src/_sgl/scanner.l"
 { BEGIN(FROM_CONTENT); return FROM; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 25 "scanner.l"
+#line 25 "src/_sgl/scanner.l"
 { return USING; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 26 "scanner.l"
+#line 26 "src/_sgl/scanner.l"
 { return GROUP; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 27 "scanner.l"
+#line 27 "src/_sgl/scanner.l"
 { return COLLECT; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 28 "scanner.l"
+#line 28 "src/_sgl/scanner.l"
 { return LAYER; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 29 "scanner.l"
+#line 29 "src/_sgl/scanner.l"
 { return SCALE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 30 "scanner.l"
+#line 30 "src/_sgl/scanner.l"
 { return BY; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 31 "scanner.l"
+#line 31 "src/_sgl/scanner.l"
 { return FACET; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 32 "scanner.l"
+#line 32 "src/_sgl/scanner.l"
 { return HORIZONTALLY; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 33 "scanner.l"
+#line 33 "src/_sgl/scanner.l"
 { return VERTICALLY; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 34 "scanner.l"
+#line 34 "src/_sgl/scanner.l"
 { return TITLE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 35 "scanner.l"
+#line 35 "src/_sgl/scanner.l"
 { return COMMA; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 36 "scanner.l"
+#line 36 "src/_sgl/scanner.l"
 {
 	yylval.int_val = atoi(yytext);
 	return INTEGER;
@@ -910,7 +910,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 40 "scanner.l"
+#line 40 "src/_sgl/scanner.l"
 { 
 	yylval.str = strdup(yytext);
 	return UNQUOTED_STRING;
@@ -919,7 +919,7 @@ YY_RULE_SETUP
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 44 "scanner.l"
+#line 44 "src/_sgl/scanner.l"
 {
 	int match_len = strlen(yytext);
 	char *unquoted_str = malloc(match_len - 1);
@@ -942,24 +942,24 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 case 18:
-#line 65 "scanner.l"
+#line 65 "src/_sgl/scanner.l"
 case 19:
-#line 66 "scanner.l"
+#line 66 "src/_sgl/scanner.l"
 case 20:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 66 "src/_sgl/scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 67 "src/_sgl/scanner.l"
 { }
 	YY_BREAK
 
 case 22:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 70 "src/_sgl/scanner.l"
 {
 		yylval.str = strdup(yytext);
 		BEGIN(INITIAL);
@@ -968,7 +968,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 75 "src/_sgl/scanner.l"
 {
 		yylval.str = malloc(MAX_SUBQUERY_LEN);
 		yylval.str[0] = '\0';
@@ -979,14 +979,14 @@ YY_RULE_SETUP
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 81 "scanner.l"
+#line 81 "src/_sgl/scanner.l"
 { }
 	YY_BREAK
 
 
 case 25:
 YY_RULE_SETUP
-#line 85 "scanner.l"
+#line 85 "src/_sgl/scanner.l"
 {
 		strcat(yylval.str, yytext);
 		unclosed_paren_count++;
@@ -994,7 +994,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 89 "scanner.l"
+#line 89 "src/_sgl/scanner.l"
 {
 		unclosed_paren_count--;
 		if(unclosed_paren_count == 0) {
@@ -1008,7 +1008,7 @@ YY_RULE_SETUP
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 98 "scanner.l"
+#line 98 "src/_sgl/scanner.l"
 {
 		strcat(yylval.str, yytext);
 	}
@@ -1016,10 +1016,10 @@ YY_RULE_SETUP
 
 case 28:
 YY_RULE_SETUP
-#line 103 "scanner.l"
+#line 103 "src/_sgl/scanner.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1022 "scanner.c"
+#line 1022 "src/_sgl/scanner.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(FROM_CONTENT):
 case YY_STATE_EOF(SUBQUERY_CONTENT):
@@ -1989,7 +1989,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 103 "scanner.l"
+#line 103 "src/_sgl/scanner.l"
 
 
 void set_scanner_input(const char *input_string) {

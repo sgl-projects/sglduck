@@ -18,7 +18,7 @@ class BuildExt(build_ext):
     Pybind11Extension applies the C++ standard flag (``-std=c++17``) to every
     source in the extension, but clang rejects ``-std=c++17`` when compiling a
     ``.c`` file as C. We compile a mix of committed C sources and two C++ files
-    (the bridge + the panic shim) in one extension, so strip any ``-std=`` flag
+    (the bridge + the error shim) in one extension, so strip any ``-std=`` flag
     when the source being compiled is C.
     """
 
@@ -38,7 +38,7 @@ class BuildExt(build_ext):
 
 _SGL_SOURCES = [
     "src/_sgl/sgl_to_pgs.cpp",   # pybind11 bridge
-    "src/_sgl/panic.cpp",        # sgl_panic() fatal-error shim (C++: throws)
+    "src/_sgl/sgl_error.cpp",    # sgl_error() fatal-error shim (C++: throws)
     "src/_sgl/parser.tab.c",     # committed bison output
     "src/_sgl/scanner.c",        # committed flex output
     "src/_sgl/aes.c",
@@ -50,7 +50,7 @@ _SGL_SOURCES = [
     "src/_sgl/case.c",
 ]
 
-# sgl_panic() throws a C++ exception that must unwind through the C parser
+# sgl_error() throws a C++ exception that must unwind through the C parser
 # frames (sgl_to_cgs / yyparse) to reach the bridge. -fexceptions makes that
 # unwinding well-defined for the C sources on GCC/Clang. (MSVC enables C++
 # exception unwinding through extern "C" by default.)
