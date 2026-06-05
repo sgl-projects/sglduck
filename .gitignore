@@ -1,0 +1,20 @@
+# Python build / packaging artifacts
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+
+# Compiled C/C++ objects and extension modules
+*.o
+*.so
+*.pyd
+
+# Virtual environment
+.venv/
+
+# Claude Code (local settings, skills, agents, commands, credentials)
+.claude/
+
+# NOTE: the committed bison/flex output (src/_sgl/parser.tab.c, parser.tab.h,
+# scanner.c) is intentionally NOT ignored — it is checked in.

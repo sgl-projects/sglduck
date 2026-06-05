@@ -1,0 +1,8 @@
+# Ship the committed C/C++ sources + headers so the sdist builds with only a
+# C/C++ compiler. Exclude the developer-only grammar sources and makefile
+# (bison/flex regeneration) — the analog of rsgl's .Rbuildignore.
+graft src/_sgl
+global-exclude *.o *.so
+exclude src/_sgl/parser.y
+exclude src/_sgl/scanner.l
+exclude makefile
