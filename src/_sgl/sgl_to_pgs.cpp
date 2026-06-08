@@ -16,16 +16,14 @@ extern "C" {
 namespace py = pybind11;
 
 /*
- * pybind11 bridge — the Python analog of rsgl's Rcpp bridge (sgl_to_rgs.cpp).
+ * pybind11 bridge from the C grammar parser to Python.
  *
- * It calls the reused C parser (sgl_to_cgs) and walks the resulting cgs linked
- * lists in the same order as the Rcpp bridge, emitting plain Python containers
- * (the "pgs" structure) instead of an Rcpp::List. Class variants are carried as
- * string tags under a "class" key (e.g. {"class": "sgl_geom_point"}), exactly
- * where the Rcpp bridge set the S3 class attribute; pgs.py reconstructs typed
- * objects from those tags. Like the Rcpp bridge, it emits one pgs layer per
+ * It calls the C parser (sgl_to_cgs) and walks the resulting cgs linked lists,
+ * emitting plain Python containers (the "pgs" structure). Class variants are
+ * carried as string tags under a "class" key (e.g. {"class": "sgl_geom_point"});
+ * pgs.py reconstructs typed objects from those tags. It emits one pgs layer per
  * geom_expr (a layer with N geoms expands to N pgs layers sharing source/aes),
- * and it frees the C structs in the same order.
+ * and frees the C structs as it goes.
  */
 
 static std::string aes_name(enum aes a) {
@@ -114,7 +112,7 @@ static py::dict sgl_to_pgs(const std::string &sgl_stmt) {
 	// Call the reused C parser.
 	sgl_to_cgs(sgl_stmt.c_str(), &cgs, &errmsg);
 
-	// Check for errors (parser/scanner messages, matching rsgl's Rcpp::stop).
+	// Check for errors (parser/scanner messages) and raise them to Python.
 	if (errmsg != NULL) {
 		std::string error_message(errmsg);
 		free(errmsg);
@@ -187,7 +185,7 @@ static py::dict sgl_to_pgs(const std::string &sgl_stmt) {
 			layers.append(layer_copy);
 		}
 
-		// Free this layer's allocations, matching the Rcpp bridge.
+		// Free this layer's allocations.
 		if (current_layer->source_sql_query != NULL) {
 			free(current_layer->source_sql_query);
 		}

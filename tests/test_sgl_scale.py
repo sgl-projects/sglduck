@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_scale.R (the SglScale base class, pure methods only).
+"""Tests for the SglScale base class (pure methods only).
 
 ``valid_scale`` requires layers and DataFrames and belongs to the validation
 milestone, so it is not ported here yet.

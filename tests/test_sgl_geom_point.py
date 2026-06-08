@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_geom_point.R (pure methods only).
+"""Tests for SglGeomPoint (pure methods only).
 
 ``plotnine_aes`` is deferred to the rendering milestone.
 """

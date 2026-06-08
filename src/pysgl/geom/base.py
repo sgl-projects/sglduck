@@ -1,8 +1,7 @@
-"""Base class for SGL geoms (~ R/sgl_geom.R).
+"""Base class for SGL geoms.
 
-As with CTAs, rsgl represents a geom as an empty, S3-classed list and dispatches
-behaviour through generics; here each generic becomes a method. Geoms are
-stateless value objects with class-based equality and hashing.
+As with CTAs, a geom's behaviour lives in methods on the class hierarchy. Geoms
+are stateless value objects with class-based equality and hashing.
 
 Methods that require a layer, DataFrame or scales (``plotnine_aes``,
 ``group_aes_cols``) belong to the rendering milestone and are not defined here

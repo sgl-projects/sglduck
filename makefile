@@ -1,4 +1,4 @@
-# DEV-ONLY makefile — mirrors rsgl/makefile.
+# DEV-ONLY makefile.
 #
 # Regenerates the committed bison/flex output and (re)builds the extension.
 # This file is NOT part of the sdist/wheel (see MANIFEST.in): end users compile

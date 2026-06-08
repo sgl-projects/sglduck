@@ -1,8 +1,8 @@
-"""Base class for SGL scales (~ R/sgl_scale.R).
+"""Base class for SGL scales.
 
-As with geoms and CTAs, rsgl represents a scale as an empty, S3-classed list and
-dispatches behaviour through generics; here each generic becomes a method.
-Scales are stateless value objects with class-based equality and hashing.
+As with geoms and CTAs, a scale's behaviour lives in methods on the class
+hierarchy. Scales are stateless value objects with class-based equality and
+hashing.
 
 Methods that require layers, DataFrames or the full grammar structure
 (``valid_scale``, ``plotnine_scales``) belong to the validation and rendering

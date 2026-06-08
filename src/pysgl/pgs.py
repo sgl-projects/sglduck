@@ -2,14 +2,10 @@
 
 The compiled bridge (``pysgl._sgl.sgl_to_pgs``) returns the pgs as plain Python
 containers, carrying geom/cta/scale variants as ``{"class": "sgl_..."}`` string
-tags — exactly where rsgl's Rcpp bridge set the S3 ``class`` attribute. This
-module walks that structure and swaps each class-tagged dict for the
+tags. This module walks that structure and swaps each class-tagged dict for the
 corresponding typed object (``SglGeom*`` / ``SglCta*`` / ``SglScale*``), leaving
-the surrounding lists/dicts untouched. The result mirrors rsgl's ``rgs``: a
-nested structure whose geom/cta/scale leaves are classed value objects.
-
-``sgl_to_pgs`` is the Python-side analog of rsgl's ``sgl_to_rgs`` (which in R is
-the Rcpp function itself, since Rcpp sets the classes inline).
+the surrounding lists/dicts untouched. The result is a nested structure whose
+geom/cta/scale leaves are classed value objects.
 """
 
 from __future__ import annotations

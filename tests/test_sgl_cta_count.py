@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_cta_count.R (pure methods only).
+"""Tests for SglCtaCount (pure methods only).
 
 ``valid_cta``, ``agg_col_name`` and ``agg_col_expr`` are deferred to the
 validation and data-pipeline milestones.

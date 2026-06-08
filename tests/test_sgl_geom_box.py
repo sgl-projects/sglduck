@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_geom_box.R (pure methods only).
+"""Tests for SglGeomBox (pure methods only).
 
 ``group_aes_cols`` and ``plotnine_aes`` require a layer/DataFrame/scales and are
 deferred to the rendering milestone.

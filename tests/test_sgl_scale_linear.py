@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_scale_linear.R (pure methods only).
+"""Tests for SglScaleLinear (pure methods only).
 
 ``valid_scale`` and ``plotnine_scales`` require layers/DataFrames/the full pgs
 and belong to the validation and rendering milestones, so they are not ported

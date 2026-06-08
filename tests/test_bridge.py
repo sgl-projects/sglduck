@@ -1,6 +1,6 @@
-"""Port of rsgl's tests/testthat/test-RcppExports.R.
+"""Tests for the C bridge + ``pgs.reconstruct_pgs``.
 
-Asserts the pgs contract produced by the C bridge + ``pgs.reconstruct_pgs``:
+Asserts the pgs contract:
 aes mappings, CTAs and their args, source SQL, geoms/quals, groupings,
 collections, layer expansion and order, scales, facets, titles, and parser
 error messages.

@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_cta_bin.R (pure methods only).
+"""Tests for SglCtaBin (pure methods only).
 
 ``valid_cta`` and ``add_transformed_column`` require a DataFrame/scale and
 belong to the validation and data-pipeline milestones, so they are not ported

@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_cta_avg.R (pure methods only).
+"""Tests for SglCtaAvg (pure methods only).
 
 ``valid_cta``, ``agg_col_name`` and ``agg_col_expr`` require a DataFrame/scale
 and belong to the validation and data-pipeline milestones, so they are not

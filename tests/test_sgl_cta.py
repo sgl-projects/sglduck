@@ -1,8 +1,7 @@
-"""Port of rsgl's test-sgl_cta.R (the SglCta base class).
+"""Tests for the SglCta base class.
 
-rsgl's construction tests assert S3 internals (class attribute chain, empty-list
-base object); the Pythonic equivalents are class/instance identity and the
-value-equality semantics that replace R's ``identical()`` / ``%in%``.
+These cover class/instance identity and the value-equality semantics used to
+compare and de-duplicate CTAs.
 """
 
 from pysgl.cta import SglCta, SglCtaIdentity

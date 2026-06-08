@@ -1,7 +1,7 @@
 """SGL geoms.
 
-Mirrors rsgl's ``R/sgl_geom*.R``. ``SglGeom`` is the base class; one subclass
-per geom variant (point, bar, line, box), matching rsgl's S3 hierarchy.
+``SglGeom`` is the base class; one subclass per geom variant (point, bar, line,
+box).
 """
 
 from .bar import SglGeomBar

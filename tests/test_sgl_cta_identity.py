@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_cta_identity.R (pure methods only).
+"""Tests for SglCtaIdentity (pure methods only).
 
 ``valid_cta`` requires a DataFrame and is part of the validation milestone, so
 it is not ported here yet.

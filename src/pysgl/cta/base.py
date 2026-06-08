@@ -1,10 +1,8 @@
-"""Base class for SGL CTAs (~ R/sgl_cta.R).
+"""Base class for SGL CTAs.
 
-In rsgl a CTA is an empty, S3-classed list and its behaviour lives in
-single-dispatch generics (``R/generics.R``); here each generic becomes a method
-on the class hierarchy. CTAs are stateless value objects, so two instances of
-the same class compare equal and hash alike — mirroring rsgl's reliance on
-``identical()`` and ``%in%`` to de-duplicate groupings/collections.
+A CTA's behaviour lives in methods on the class hierarchy. CTAs are stateless
+value objects, so two instances of the same class compare equal and hash alike;
+this lets groupings and collections be de-duplicated by value.
 
 Methods that require a DataFrame, layer or scales (``valid_cta``,
 ``add_transformed_column``, ``agg_col_name``, ``agg_col_expr``) belong to the

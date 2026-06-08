@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_scale_log.R (pure methods only).
+"""Tests for SglScaleLog (pure methods only).
 
 ``valid_scale`` and ``plotnine_scales`` are deferred to the validation and
 rendering milestones.

@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_geom_bar.R (pure methods only).
+"""Tests for SglGeomBar (pure methods only).
 
 ``plotnine_aes`` (including the colour -> fill remap) is deferred to the
 rendering milestone.

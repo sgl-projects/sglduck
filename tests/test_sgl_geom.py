@@ -1,4 +1,4 @@
-"""Port of rsgl's test-sgl_geom.R (the SglGeom base class, pure methods only).
+"""Tests for the SglGeom base class (pure methods only).
 
 ``plotnine_aes`` requires a layer/DataFrame/scales and belongs to the rendering
 milestone, so it is not ported here yet.
