@@ -15,6 +15,7 @@
 #include "scale.h"
 #include "direction.h"
 #include "case.h"
+#include "cgs_order.h"
 
 void set_scanner_input(const char *input_string);
 void delete_scanner_buffer(void);
@@ -355,38 +356,10 @@ title_expr: UNQUOTED_STRING AS SINGLE_QUOTED_STRING {
 
 %%
 
-void reverse_layers(struct cgs *cgs) {
-	struct layer *previous_layer = NULL;
-	struct layer *current_layer = cgs->layers;
-	struct layer *next_layer;
-
-	struct geom_expr *previous_geom;
-	struct geom_expr *current_geom;
-	struct geom_expr *next_geom;
-
-	while(current_layer != NULL) {
-		previous_geom = NULL;
-		current_geom = current_layer->geoms;
-		while(current_geom != NULL) {
-			next_geom = current_geom->next;	
-			current_geom->next = previous_geom;
-			previous_geom = current_geom;
-			current_geom = next_geom;	
-		}	
-		current_layer->geoms = previous_geom;
-
-		next_layer = current_layer->next;	
-		current_layer->next = previous_layer;
-		previous_layer = current_layer;
-		current_layer = next_layer;	
-	}
-	cgs->layers = previous_layer;
-}
-
 void sgl_to_cgs(const char *sgl_stmt, struct cgs *cgs, char **errmsg) {
 	set_scanner_input(sgl_stmt);
 	int parse_result = yyparse(cgs, errmsg);
-	reverse_layers(cgs);
+	reorder_cmpnts(cgs);
 	delete_scanner_buffer();
 
 	if (parse_result != 0) {

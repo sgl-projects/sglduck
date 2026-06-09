@@ -13,9 +13,6 @@ from __future__ import annotations
 
 
 class SglScale:
-    def scale_name(self) -> str:
-        return "base"
-
     def __eq__(self, other: object) -> bool:
         return type(self) is type(other)
 

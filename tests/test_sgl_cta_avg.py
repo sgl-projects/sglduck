@@ -13,8 +13,8 @@ def test_is_an_sgl_cta_avg():
     assert isinstance(SglCtaAvg(), SglCta)
 
 
-def test_cta_fn_name_returns_avg():
-    assert SglCtaAvg().cta_fn_name() == "avg"
+def test_sgl_func_name_returns_avg():
+    assert SglCtaAvg().sgl_func_name() == "avg"
 
 
 def test_is_aggregation_returns_true():

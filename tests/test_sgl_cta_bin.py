@@ -13,8 +13,8 @@ def test_is_an_sgl_cta_bin():
     assert isinstance(SglCtaBin(), SglCta)
 
 
-def test_cta_fn_name_returns_bin():
-    assert SglCtaBin().cta_fn_name() == "bin"
+def test_sgl_func_name_returns_bin():
+    assert SglCtaBin().sgl_func_name() == "bin"
 
 
 def test_is_aggregation_returns_false():

@@ -6,7 +6,7 @@ from .base import SglScale
 
 
 class SglScaleLinear(SglScale):
-    def scale_name(self) -> str:
+    def sgl_func_name(self) -> str:
         return "linear"
 
     def apply_scale(self, values):

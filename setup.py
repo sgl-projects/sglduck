@@ -48,6 +48,7 @@ _SGL_SOURCES = [
     "src/_sgl/scale.c",
     "src/_sgl/keyword.c",
     "src/_sgl/case.c",
+    "src/_sgl/cgs_order.c",
 ]
 
 # sgl_error() throws a C++ exception that must unwind through the C parser
