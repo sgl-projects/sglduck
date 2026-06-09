@@ -6,7 +6,7 @@ from .base import SglCta
 
 
 class SglCtaBin(SglCta):
-    def cta_fn_name(self) -> str:
+    def sgl_func_name(self) -> str:
         return "bin"
 
     def is_aggregation(self) -> bool:
@@ -16,7 +16,7 @@ class SglCtaBin(SglCta):
         return True
 
     def expr_text(self, col_expr: dict) -> str:
-        fn_name = self.cta_fn_name()
+        fn_name = self.sgl_func_name()
         if "arg" in col_expr:
             return f"{fn_name}({col_expr['column']}, {col_expr['arg']})"
         return f"{fn_name}({col_expr['column']})"

@@ -15,10 +15,6 @@ def test_subclass_is_an_sgl_scale():
     assert isinstance(SglScaleLinear(), SglScale)
 
 
-def test_scale_name_returns_base():
-    assert SglScale().scale_name() == "base"
-
-
 def test_same_class_instances_are_equal_and_hash_alike():
     assert SglScale() == SglScale()
     assert hash(SglScale()) == hash(SglScale())

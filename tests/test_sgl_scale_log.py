@@ -14,8 +14,8 @@ def test_is_an_sgl_scale_log():
     assert isinstance(SglScaleLog(), SglScale)
 
 
-def test_scale_name_returns_log():
-    assert SglScaleLog().scale_name() == "log"
+def test_sgl_func_name_returns_log():
+    assert SglScaleLog().sgl_func_name() == "log"
 
 
 def test_apply_scale_returns_base_10_log():

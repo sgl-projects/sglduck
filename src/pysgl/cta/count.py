@@ -6,7 +6,7 @@ from .base import SglCta
 
 
 class SglCtaCount(SglCta):
-    def cta_fn_name(self) -> str:
+    def sgl_func_name(self) -> str:
         return "count"
 
     def is_aggregation(self) -> bool:
@@ -19,4 +19,4 @@ class SglCtaCount(SglCta):
         return False
 
     def expr_text(self, col_expr: dict) -> str:
-        return f"{self.cta_fn_name()}(*)"
+        return f"{self.sgl_func_name()}(*)"

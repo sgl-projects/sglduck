@@ -15,8 +15,8 @@ def test_is_an_sgl_scale_linear():
     assert isinstance(SglScaleLinear(), SglScale)
 
 
-def test_scale_name_returns_linear():
-    assert SglScaleLinear().scale_name() == "linear"
+def test_sgl_func_name_returns_linear():
+    assert SglScaleLinear().sgl_func_name() == "linear"
 
 
 def test_apply_scale_returns_original_values():

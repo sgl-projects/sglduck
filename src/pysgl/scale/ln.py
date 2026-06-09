@@ -8,7 +8,7 @@ from .base import SglScale
 
 
 class SglScaleLn(SglScale):
-    def scale_name(self) -> str:
+    def sgl_func_name(self) -> str:
         return "ln"
 
     def apply_scale(self, values):

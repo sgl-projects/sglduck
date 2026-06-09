@@ -12,8 +12,8 @@ def test_is_an_sgl_cta_count():
     assert isinstance(SglCtaCount(), SglCta)
 
 
-def test_cta_fn_name_returns_count():
-    assert SglCtaCount().cta_fn_name() == "count"
+def test_sgl_func_name_returns_count():
+    assert SglCtaCount().sgl_func_name() == "count"
 
 
 def test_is_aggregation_returns_true():

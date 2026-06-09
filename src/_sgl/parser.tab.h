@@ -81,7 +81,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 29 "src/_sgl/parser.y"
+#line 30 "src/_sgl/parser.y"
 
 	char *str;
 	int int_val;
