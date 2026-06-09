@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import plotnine
+
 from .base import SglGeom
 
 
@@ -16,6 +18,4 @@ class SglGeomLine(SglGeom):
         return True
 
     def plotnine_geom(self):
-        import plotnine
-
         return plotnine.geom_line
