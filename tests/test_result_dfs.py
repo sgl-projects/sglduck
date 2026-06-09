@@ -1,4 +1,4 @@
-"""Tests for ``result_dfs`` (port of rsgl's test-result_dfs.R)."""
+"""Tests for ``result_dfs``."""
 
 import pandas as pd
 import pytest

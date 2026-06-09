@@ -1,4 +1,4 @@
-"""The bin transformation CTA (~ R/sgl_cta_bin.R)."""
+"""The bin transformation CTA."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""The count aggregation CTA (~ R/sgl_cta_count.R)."""
+"""The count aggregation CTA."""
 
 from __future__ import annotations
 

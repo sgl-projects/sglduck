@@ -1,11 +1,9 @@
 """Run each layer's source SQL query into a pandas DataFrame.
 
-Analog of rsgl's ``R/result_dfs.R``: maps each pgs layer to the DataFrame
-produced by executing its ``source_sql_query`` against the supplied database
-connection. ``con`` is anything ``pandas.read_sql_query`` accepts — a SQLAlchemy
-engine/connection or any DB-API 2.0 (PEP 249) connection (e.g. DuckDB,
-sqlite3) — mirroring how rsgl's ``DBI::dbGetQuery`` runs against any DBI
-connection.
+Maps each pgs layer to the DataFrame produced by executing its
+``source_sql_query`` against the supplied database connection. ``con`` is
+anything ``pandas.read_sql_query`` accepts — a SQLAlchemy engine/connection or
+any DB-API 2.0 (PEP 249) connection (e.g. DuckDB, sqlite3).
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""The avg aggregation CTA (~ R/sgl_cta_avg.R)."""
+"""The avg aggregation CTA."""
 
 from __future__ import annotations
 

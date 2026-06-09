@@ -1,4 +1,4 @@
-"""The bar geom (~ R/sgl_geom_bar.R)."""
+"""The bar geom."""
 
 from __future__ import annotations
 

@@ -1,7 +1,6 @@
 """Shared pytest fixtures and data loading.
 
-Mirrors rsgl's ``tests/testthat/setup.R`` + ``R/create_con_and_load_data.R``:
-builds a DuckDB connection loaded with the ``cars`` (mtcars), ``economics``,
+Builds a DuckDB connection loaded with the ``cars`` (mtcars), ``economics``,
 ``synth``, and ``diamonds`` tables used across the test suite.
 """
 

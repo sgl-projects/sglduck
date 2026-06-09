@@ -1,4 +1,4 @@
-"""The identity CTA (~ R/sgl_cta_identity.R)."""
+"""The identity CTA."""
 
 from __future__ import annotations
 

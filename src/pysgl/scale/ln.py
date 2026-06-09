@@ -1,4 +1,4 @@
-"""The natural-log scale (~ R/sgl_scale_ln.R)."""
+"""The natural-log scale."""
 
 from __future__ import annotations
 
