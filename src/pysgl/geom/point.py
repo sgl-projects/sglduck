@@ -1,4 +1,4 @@
-"""The point geom (~ R/sgl_geom_point.R)."""
+"""The point geom."""
 
 from __future__ import annotations
 

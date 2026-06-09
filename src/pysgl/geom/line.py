@@ -1,4 +1,4 @@
-"""The line geom (~ R/sgl_geom_line.R)."""
+"""The line geom."""
 
 from __future__ import annotations
 

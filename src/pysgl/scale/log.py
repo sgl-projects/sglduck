@@ -1,4 +1,4 @@
-"""The base-10 log scale (~ R/sgl_scale_log.R)."""
+"""The base-10 log scale."""
 
 from __future__ import annotations
 

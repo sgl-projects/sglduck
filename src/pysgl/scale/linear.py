@@ -1,4 +1,4 @@
-"""The linear (identity) scale (~ R/sgl_scale_linear.R)."""
+"""The linear (identity) scale."""
 
 from __future__ import annotations
 

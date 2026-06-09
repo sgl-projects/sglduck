@@ -1,4 +1,4 @@
-"""The box geom (~ R/sgl_geom_box.R)."""
+"""The box geom."""
 
 from __future__ import annotations
 
