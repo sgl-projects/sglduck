@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import plotnine
+
 from .base import SglGeom
 
 
@@ -13,6 +15,4 @@ class SglGeomPoint(SglGeom):
         return False
 
     def plotnine_geom(self):
-        import plotnine
-
         return plotnine.geom_point
