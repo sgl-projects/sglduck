@@ -47,6 +47,7 @@ _SGL_SOURCES = [
     "src/_sgl/qual.c",
     "src/_sgl/scale.c",
     "src/_sgl/keyword.c",
+    "src/_sgl/title.c",
     "src/_sgl/case.c",
     "src/_sgl/cgs_order.c",
 ]

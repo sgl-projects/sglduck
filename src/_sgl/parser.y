@@ -15,6 +15,7 @@
 #include "scale.h"
 #include "direction.h"
 #include "case.h"
+#include "title.h"
 #include "cgs_order.h"
 
 void set_scanner_input(const char *input_string);
@@ -343,6 +344,19 @@ title_expr: UNQUOTED_STRING AS SINGLE_QUOTED_STRING {
 	}	
 
 	enum aes aes = aes_enum(aes_str);
+
+	if (title_exists(aes, cgs->titles)) {
+		print_result = asprintf(
+			errmsg,
+			"Multiple titles provided for the %s aesthetic\n",
+			aes_str
+		);
+		if(print_result == -1) {
+			sgl_error("Memory allocation failed.");
+		}
+		YYERROR;
+	}
+
 	free(aes_str);
 
 	struct title_expr *new_title = malloc(sizeof(struct title_expr));

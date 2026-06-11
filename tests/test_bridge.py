@@ -969,6 +969,21 @@ def test_raises_error_for_unquoted_title():
     )
 
 
+def test_raises_error_for_multiple_titles_for_aes():
+    assert_raises_message(
+        """
+        visualize
+            col_1 as x
+        from table_1
+        using points
+        title
+            x as 'first title',
+            x as 'second title'
+        """,
+        "Multiple titles provided for the x aesthetic\n",
+    )
+
+
 def test_raises_error_for_general_syntax_error():
     assert_raises_message(
         """
