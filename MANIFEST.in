@@ -6,4 +6,4 @@ global-exclude *.o *.so
 exclude src/_sgl/parser.y
 exclude src/_sgl/scanner.l
 exclude makefile
-prune src/test
+prune tests

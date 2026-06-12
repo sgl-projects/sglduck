@@ -11,7 +11,7 @@ __pycache__/
 *.pyd
 
 # Criterion C unit-test binary (built by `make test`)
-src/test/test
+tests/_sgl/test
 
 # Virtual environment
 .venv/

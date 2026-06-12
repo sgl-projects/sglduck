@@ -1,7 +1,7 @@
 # DEV-ONLY makefile.
 #
 # Regenerates the committed bison/flex output, (re)builds the extension, and
-# builds/runs the Criterion C unit tests in src/test (requires the criterion
+# builds/runs the Criterion C unit tests in tests/_sgl (requires the criterion
 # library, e.g. `brew install criterion`).
 # This file is NOT part of the sdist/wheel (see MANIFEST.in): end users compile
 # the already-generated src/_sgl/parser.tab.c, parser.tab.h and scanner.c with a
@@ -14,7 +14,7 @@ CRITERION_CFLAGS := $(shell pkg-config --cflags criterion)
 TEST_LDFLAGS := $(shell pkg-config --libs criterion)
 
 SRC = src/_sgl
-TEST = src/test
+TEST = tests/_sgl
 
 SRC_OBJS = $(SRC)/parser.tab.o $(SRC)/scanner.o $(SRC)/aes.o $(SRC)/geom.o $(SRC)/cta.o $(SRC)/qual.o $(SRC)/scale.o $(SRC)/keyword.o $(SRC)/title.o $(SRC)/case.o $(SRC)/cgs_order.o
 TEST_OBJS = $(TEST)/test_sgl_to_cgs.o $(TEST)/test_aes.o $(TEST)/test_geom.o $(TEST)/test_cta.o $(TEST)/test_qual.o $(TEST)/test_scale.o $(TEST)/test_keyword.o $(TEST)/test_title.o $(TEST)/test_case.o $(TEST)/test_cgs_order.o $(TEST)/stubs.o
