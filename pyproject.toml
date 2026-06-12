@@ -32,6 +32,10 @@ Homepage = "https://github.com/sgl-projects/pysgl"
 Source = "https://github.com/sgl-projects/pysgl"
 Paper = "https://arxiv.org/abs/2505.14690"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
+
 [tool.setuptools]
 package-dir = { "" = "src" }
 
