@@ -10,6 +10,7 @@ from pysgl.utils import (
     all_aesthetics,
     col_expr_has_cta,
     column_from_aes,
+    filter_agg_exprs,
     filter_col_exprs_by_cta,
 )
 
@@ -96,6 +97,25 @@ def test_filter_col_exprs_by_cta_returns_matches_for_ctas_other_than_bin():
 def test_filter_col_exprs_by_cta_raises_error_for_invalid_cta_name():
     with pytest.raises(ValueError):
         filter_col_exprs_by_cta([], "notacta")
+
+
+def test_filter_agg_exprs_returns_empty_list_if_no_col_exprs_have_aggregation():
+    col_expr_1 = {"column": "col_1", "cta": SglCtaIdentity()}
+    col_expr_2 = {"column": "col_2", "cta": SglCtaBin()}
+    col_exprs = [col_expr_1, col_expr_2]
+
+    assert filter_agg_exprs(col_exprs) == []
+
+
+def test_filter_agg_exprs_returns_agg_exprs_only():
+    col_expr_1 = {"column": "col_1", "cta": SglCtaIdentity()}
+    col_expr_2 = {"column": "col_2", "cta": SglCtaAvg()}
+    col_expr_3 = {"column": "*", "cta": SglCtaCount()}
+    col_exprs = [col_expr_1, col_expr_2, col_expr_3]
+
+    expected_result = [col_expr_2, col_expr_3]
+
+    assert filter_agg_exprs(col_exprs) == expected_result
 
 
 def test_all_aesthetics_returns_all_aesthetics_from_single_layer_mapping():

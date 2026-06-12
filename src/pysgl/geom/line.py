@@ -20,6 +20,9 @@ class SglGeomLine(SglGeom):
     def is_collective(self) -> bool:
         return True
 
+    def extension(self) -> int:
+        return 2
+
     def has_direction(self) -> bool:
         return True
 

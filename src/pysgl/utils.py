@@ -1,8 +1,4 @@
-"""Helpers shared across the pgs pipeline modules.
-
-``filter_agg_exprs`` is deferred until the ``is_aggregation`` generic lands on
-the CTA classes.
-"""
+"""Helpers shared across the pgs pipeline modules."""
 
 from __future__ import annotations
 
@@ -34,6 +30,11 @@ def filter_col_exprs_by_cta(col_exprs: list[dict], cta_name: str) -> list[dict]:
             f"cta_name must be one of {list(_CTA_NAME_TO_OBJECT)}, got {cta_name!r}"
         )
     return [col_expr for col_expr in col_exprs if col_expr_has_cta(col_expr, cta_name)]
+
+
+def filter_agg_exprs(col_exprs: list[dict]) -> list[dict]:
+    """The col_exprs whose cta is an aggregation."""
+    return [col_expr for col_expr in col_exprs if col_expr["cta"].is_aggregation()]
 
 
 def all_aesthetics(pgs: dict) -> list[str]:
