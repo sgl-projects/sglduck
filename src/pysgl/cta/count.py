@@ -2,12 +2,27 @@
 
 from __future__ import annotations
 
+import pandas as pd
+
+from ..errors import SglError
 from .base import SglCta
+from .utils import raise_if_arg_present
 
 
 class SglCtaCount(SglCta):
     def sgl_func_name(self) -> str:
         return "count"
+
+    def valid_cta(self, col_expr: dict, df: pd.DataFrame) -> None:
+        count_fn_name = self.sgl_func_name()
+        col_name = col_expr["column"]
+        if col_name != "*":
+            raise SglError(
+                f"Error: {count_fn_name} can only be applied to *,"
+                f" found {count_fn_name}({col_name})."
+            )
+
+        raise_if_arg_present(col_expr)
 
     def is_aggregation(self) -> bool:
         return True

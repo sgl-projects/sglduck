@@ -4,10 +4,9 @@ A CTA's behaviour lives in methods on the class hierarchy. CTAs are stateless
 value objects, so two instances of the same class compare equal and hash alike;
 this lets groupings and collections be de-duplicated by value.
 
-Methods that require a DataFrame, layer or scales (``valid_cta``,
-``add_transformed_column``, ``agg_col_name``, ``agg_col_expr``) belong to the
-validation and data-pipeline milestones and are intentionally not defined here
-yet.
+Methods that require a layer or scales (``add_transformed_column``,
+``agg_col_name``, ``agg_col_expr``) belong to the data-pipeline milestone and
+are intentionally not defined here yet.
 """
 
 from __future__ import annotations

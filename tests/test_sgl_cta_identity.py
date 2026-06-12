@@ -1,15 +1,33 @@
-"""Tests for SglCtaIdentity (pure methods only).
+"""Tests for SglCtaIdentity."""
 
-``valid_cta`` requires a DataFrame and is part of the validation milestone, so
-it is not ported here yet.
-"""
+import re
 
+import pandas as pd
+import pytest
+
+from pysgl import SglError
 from pysgl.cta import SglCta, SglCtaIdentity
 
 
 def test_is_an_sgl_cta_identity():
     assert isinstance(SglCtaIdentity(), SglCtaIdentity)
     assert isinstance(SglCtaIdentity(), SglCta)
+
+
+def test_valid_cta_raises_error_for_star():
+    col_expr = {"column": "*", "cta": SglCtaIdentity()}
+
+    with pytest.raises(
+        SglError,
+        match=re.escape("Error: '*' can only be used inside an aggregation function"),
+    ):
+        SglCtaIdentity().valid_cta(col_expr, pd.DataFrame())
+
+
+def test_valid_cta_doesnt_raise_error_for_non_star_column():
+    col_expr = {"column": "col", "cta": SglCtaIdentity()}
+
+    SglCtaIdentity().valid_cta(col_expr, pd.DataFrame())
 
 
 def test_is_aggregation_returns_false():

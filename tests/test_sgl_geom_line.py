@@ -28,3 +28,11 @@ def test_plotnine_geom_returns_geom_line():
 
 def test_has_direction_returns_true():
     assert SglGeomLine().has_direction() is True
+
+
+def test_valid_qual_list_returns_direction_and_regression_quals():
+    assert SglGeomLine().valid_qual_list() == ["horizontal", "regression", "vertical"]
+
+
+def test_valid_non_pos_aes_returns_color():
+    assert SglGeomLine().valid_non_pos_aes() == ["color"]

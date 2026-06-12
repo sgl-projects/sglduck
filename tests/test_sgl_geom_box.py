@@ -28,3 +28,11 @@ def test_plotnine_geom_returns_geom_boxplot():
 
 def test_has_direction_returns_true():
     assert SglGeomBox().has_direction() is True
+
+
+def test_valid_qual_list_returns_direction_quals():
+    assert SglGeomBox().valid_qual_list() == ["horizontal", "vertical"]
+
+
+def test_valid_non_pos_aes_returns_color():
+    assert SglGeomBox().valid_non_pos_aes() == ["color"]

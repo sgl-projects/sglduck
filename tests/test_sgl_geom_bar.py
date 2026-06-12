@@ -28,3 +28,11 @@ def test_plotnine_geom_returns_geom_bar():
 
 def test_has_direction_returns_true():
     assert SglGeomBar().has_direction() is True
+
+
+def test_valid_qual_list_returns_direction_quals():
+    assert SglGeomBar().valid_qual_list() == ["horizontal", "unstacked", "vertical"]
+
+
+def test_valid_non_pos_aes_returns_color():
+    assert SglGeomBar().valid_non_pos_aes() == ["color"]
