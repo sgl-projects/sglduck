@@ -22,6 +22,10 @@ def test_is_collective_returns_true():
     assert SglGeomBox().is_collective() is True
 
 
+def test_extension_returns_one():
+    assert SglGeomBox().extension() == 1
+
+
 def test_plotnine_geom_returns_geom_boxplot():
     assert SglGeomBox().plotnine_geom() is plotnine.geom_boxplot
 

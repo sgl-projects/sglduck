@@ -62,3 +62,16 @@ def test_con():
     con = create_con_and_load_data()
     yield con
     con.close()
+
+
+@pytest.fixture
+def synth_with_blob_col(test_con):
+    """Temporarily add a BLOB column (unknown SGL classification) to synth.
+
+    Cleanup is add/drop rather than begin/rollback because pandas runs its
+    queries on cursors, which are separate DuckDB connections that wouldn't
+    see an uncommitted transaction.
+    """
+    test_con.execute("alter table synth add column blob_col BLOB")
+    yield test_con
+    test_con.execute("alter table synth drop column blob_col")

@@ -22,6 +22,10 @@ def test_is_collective_returns_true():
     assert SglGeomLine().is_collective() is True
 
 
+def test_extension_returns_two():
+    assert SglGeomLine().extension() == 2
+
+
 def test_plotnine_geom_returns_geom_line():
     assert SglGeomLine().plotnine_geom() is plotnine.geom_line
 
