@@ -37,6 +37,15 @@ def filter_agg_exprs(col_exprs: list[dict]) -> list[dict]:
     return [col_expr for col_expr in col_exprs if col_expr["cta"].is_aggregation()]
 
 
+def filter_agg_mappings(aes_mappings: dict) -> dict:
+    """The aes->col_expr mappings whose cta is an aggregation, keyed by aes."""
+    return {
+        aes: col_expr
+        for aes, col_expr in aes_mappings.items()
+        if col_expr["cta"].is_aggregation()
+    }
+
+
 def all_aesthetics(pgs: dict) -> list[str]:
     """The unique aesthetics mapped across all layers, in first-seen order."""
     return list(

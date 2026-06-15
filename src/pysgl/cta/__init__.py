@@ -5,13 +5,14 @@ count, bin).
 """
 
 from .avg import SglCtaAvg
-from .base import SglCta
+from .base import Aggregation, SglCta
 from .bin import SglCtaBin
 from .count import SglCtaCount
 from .identity import SglCtaIdentity
 
 __all__ = [
     "SglCta",
+    "Aggregation",
     "SglCtaIdentity",
     "SglCtaAvg",
     "SglCtaCount",

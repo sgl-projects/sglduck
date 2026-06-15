@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ..errors import SglError
-from .base import SglCta
+from .base import Aggregation, SglCta
 from .utils import raise_if_arg_present
 
 
@@ -32,6 +32,12 @@ class SglCtaCount(SglCta):
 
     def needs_scaling(self) -> bool:
         return False
+
+    def agg_col_name(self, col_expr: dict, scale) -> str:
+        return "pysgl.count"
+
+    def agg_col_expr(self, col_expr: dict, scale) -> Aggregation:
+        return Aggregation("size", None)
 
     def expr_text(self, col_expr: dict) -> str:
         return f"{self.sgl_func_name()}(*)"

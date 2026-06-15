@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 
 from ..errors import SglError
-from .base import SglCta
+from .base import Aggregation, SglCta
 from .utils import raise_if_arg_present
 
 
@@ -38,6 +38,17 @@ class SglCtaAvg(SglCta):
 
     def needs_scaling(self) -> bool:
         return True
+
+    def agg_col_name(self, col_expr: dict, scale) -> str:
+        scale_nm = "linear" if scale is None else scale.sgl_func_name()
+        return f"pysgl.{scale_nm}.{self.sgl_func_name()}.{col_expr['column']}"
+
+    def agg_col_expr(self, col_expr: dict, scale) -> Aggregation:
+        if scale is None:
+            column = col_expr["column"]
+        else:
+            column = f"pysgl.{scale.sgl_func_name()}.{col_expr['column']}"
+        return Aggregation("mean", column)
 
     def expr_text(self, col_expr: dict) -> str:
         return f"{self.sgl_func_name()}({col_expr['column']})"
