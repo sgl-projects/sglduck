@@ -1,8 +1,4 @@
-"""Tests for SglCtaAvg.
-
-``agg_col_name`` and ``agg_col_expr`` require a scale and belong to the
-data-pipeline milestone, so they are not ported here yet.
-"""
+"""Tests for SglCtaAvg."""
 
 import re
 
@@ -10,7 +6,8 @@ import pandas as pd
 import pytest
 
 from pysgl import SglError
-from pysgl.cta import SglCta, SglCtaAvg
+from pysgl.cta import Aggregation, SglCta, SglCtaAvg
+from pysgl.scale import SglScaleLog
 
 
 def test_is_an_sgl_cta_avg():
@@ -93,6 +90,30 @@ def test_needs_scaling_returns_true():
 
 def test_is_transformation_returns_false():
     assert SglCtaAvg().is_transformation() is False
+
+
+def test_agg_col_name_with_no_scale():
+    col_expr = {"column": "col_1", "cta": SglCtaAvg()}
+    assert SglCtaAvg().agg_col_name(col_expr, None) == "pysgl.linear.avg.col_1"
+
+
+def test_agg_col_name_with_scale():
+    col_expr = {"column": "col_1", "cta": SglCtaAvg()}
+    assert (
+        SglCtaAvg().agg_col_name(col_expr, SglScaleLog()) == "pysgl.log.avg.col_1"
+    )
+
+
+def test_agg_col_expr_with_no_scale():
+    col_expr = {"column": "col_1", "cta": SglCtaAvg()}
+    assert SglCtaAvg().agg_col_expr(col_expr, None) == Aggregation("mean", "col_1")
+
+
+def test_agg_col_expr_with_scale():
+    col_expr = {"column": "col_1", "cta": SglCtaAvg()}
+    assert SglCtaAvg().agg_col_expr(col_expr, SglScaleLog()) == Aggregation(
+        "mean", "pysgl.log.col_1"
+    )
 
 
 def test_expr_text_returns_expr_for_avg_called_on_column():

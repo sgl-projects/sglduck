@@ -1,16 +1,14 @@
-"""Tests for SglCtaBin.
-
-``add_transformed_column`` requires a scale and belongs to the data-pipeline
-milestone, so it is not ported here yet.
-"""
+"""Tests for SglCtaBin."""
 
 import re
 
+import numpy as np
 import pandas as pd
 import pytest
 
 from pysgl import SglError
 from pysgl.cta import SglCta, SglCtaBin
+from pysgl.scale import SglScaleLinear, SglScaleLog
 
 
 def test_is_an_sgl_cta_bin():
@@ -93,6 +91,59 @@ def test_valid_cta_raises_error_for_negative_arg_value(test_con):
         match=re.escape("Error: number of bins must be greater than 0."),
     ):
         SglCtaBin().valid_cta(col_expr, df)
+
+
+def test_add_transformed_column_adds_correct_values_for_linear_scale():
+    df = pd.DataFrame({"col_1": np.arange(0, 11)})
+    expected = [0.992, 0.992, 2.996, 2.996, 5, 5, 5, 7.004, 7.004, 9.008, 9.008]
+
+    result = SglCtaBin().add_transformed_column(
+        "col_1", df, SglScaleLinear(), num_bins=5
+    )
+
+    np.testing.assert_allclose(result["pysgl.linear.bin.5.col_1"], expected)
+
+
+def test_add_transformed_column_adds_correct_values_for_log_scale():
+    df = pd.DataFrame({"col_1": np.power(10.0, np.arange(0, 11))})
+    expected = np.power(
+        10.0, [0.992, 0.992, 2.996, 2.996, 5, 5, 5, 7.004, 7.004, 9.008, 9.008]
+    )
+
+    result = SglCtaBin().add_transformed_column("col_1", df, SglScaleLog(), num_bins=5)
+
+    np.testing.assert_allclose(result["pysgl.log.bin.5.col_1"], expected)
+
+
+def test_add_transformed_column_uses_30_bins_by_default():
+    df = pd.DataFrame({"col_1": np.arange(0, 101)})
+
+    result = SglCtaBin().add_transformed_column("col_1", df, SglScaleLinear())
+
+    assert result["pysgl.linear.bin.30.col_1"].nunique() == 30
+
+
+def test_add_transformed_column_doesnt_modify_column_if_already_exists():
+    df = pd.DataFrame({"pysgl.linear.bin.30.col_1": [0]})
+
+    result = SglCtaBin().add_transformed_column("col_1", df, SglScaleLinear())
+
+    assert result["pysgl.linear.bin.30.col_1"].tolist() == [0]
+
+
+def test_add_transformed_column_doesnt_mutate_input_df():
+    df = pd.DataFrame({"col_1": np.arange(0, 11)})
+
+    SglCtaBin().add_transformed_column("col_1", df, SglScaleLinear())
+
+    assert list(df.columns) == ["col_1"]
+
+
+def test_add_transformed_column_requires_a_scale():
+    df = pd.DataFrame({"col_1": [0]})
+
+    with pytest.raises(TypeError):
+        SglCtaBin().add_transformed_column("col_1", df)
 
 
 def test_is_aggregation_returns_false():

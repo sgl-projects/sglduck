@@ -6,6 +6,7 @@ import pandas as pd
 
 from ..errors import SglError
 from .base import SglCta
+from .bin_utils import bin_values
 
 
 class SglCtaBin(SglCta):
@@ -30,6 +31,25 @@ class SglCtaBin(SglCta):
 
         if "arg" in col_expr and col_expr["arg"] <= 0:
             raise SglError("Error: number of bins must be greater than 0.")
+
+    def add_transformed_column(
+        self, input_col_name: str, df: pd.DataFrame, scale, num_bins: int = 30
+    ) -> pd.DataFrame:
+        """Return ``df`` with a binned column for ``input_col_name`` added.
+
+        The new column is named ``pysgl.<scale>.bin.<num_bins>.<column>``; if a
+        column by that name already exists the frame is returned unchanged, so
+        the same (column, scale, bin-count) transform is never duplicated.
+        """
+        new_col_name = (
+            f"pysgl.{scale.sgl_func_name()}.{self.sgl_func_name()}"
+            f".{num_bins}.{input_col_name}"
+        )
+        if new_col_name in df.columns:
+            return df
+        df = df.copy()
+        df[new_col_name] = bin_values(df[input_col_name], num_bins, scale)
+        return df
 
     def is_aggregation(self) -> bool:
         return False

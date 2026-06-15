@@ -1,8 +1,4 @@
-"""Tests for SglCtaCount.
-
-``agg_col_name`` and ``agg_col_expr`` require a scale and belong to the
-data-pipeline milestone, so they are not ported here yet.
-"""
+"""Tests for SglCtaCount."""
 
 import re
 
@@ -10,7 +6,8 @@ import pandas as pd
 import pytest
 
 from pysgl import SglError
-from pysgl.cta import SglCta, SglCtaCount
+from pysgl.cta import Aggregation, SglCta, SglCtaCount
+from pysgl.scale import SglScaleLog
 
 
 def test_is_an_sgl_cta_count():
@@ -66,6 +63,22 @@ def test_is_transformation_returns_false():
 
 def test_needs_scaling_returns_false():
     assert SglCtaCount().needs_scaling() is False
+
+
+def test_agg_col_name_is_pysgl_count_with_no_scale():
+    assert SglCtaCount().agg_col_name({}, None) == "pysgl.count"
+
+
+def test_agg_col_name_is_pysgl_count_with_scale():
+    assert SglCtaCount().agg_col_name({}, SglScaleLog()) == "pysgl.count"
+
+
+def test_agg_col_expr_is_size_with_no_scale():
+    assert SglCtaCount().agg_col_expr({}, None) == Aggregation("size", None)
+
+
+def test_agg_col_expr_is_size_with_scale():
+    assert SglCtaCount().agg_col_expr({}, SglScaleLog()) == Aggregation("size", None)
 
 
 def test_expr_text_returns_count_star():
