@@ -1,3 +1,4 @@
+#include"array.h"
 #include"cta.h"
 #include"keyword.h"
 
@@ -7,7 +8,7 @@ static struct keyword_enum_row cta_keyword_enum_table[] = {
   {"count", COUNT}
 };
 
-static int cta_count = KEYWORD_COUNT(cta_keyword_enum_table);
+static int cta_count = ARRAY_COUNT(cta_keyword_enum_table);
 
 int valid_cta_str(const char *cta_str) {
   return valid_keyword_str(cta_str, cta_keyword_enum_table, cta_count);

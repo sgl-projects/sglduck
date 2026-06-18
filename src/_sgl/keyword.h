@@ -1,8 +1,6 @@
 #ifndef KEYWORD_H
 #define KEYWORD_H
 
-#define KEYWORD_COUNT(table) (sizeof(table)/sizeof(table[0]))
-
 struct keyword_enum_row {
   const char *keyword;
   int enum_int;

@@ -1,4 +1,5 @@
 #include<criterion/criterion.h>
+#include<array.h>
 #include<aes.h>
 
 Test(valid_aes_str, treats_null_ptr_as_invalid) {
@@ -16,7 +17,7 @@ Test(valid_aes_str, treats_aes_keywords_as_valid) {
 		"color",
 		"size"
 	};
-	size_t keyword_count = sizeof(keywords)/sizeof(keywords[0]);
+	size_t keyword_count = ARRAY_COUNT(keywords);
 
 	for(int i=0; i < keyword_count; i++) {
 		cr_expect(
@@ -47,7 +48,7 @@ Test(aes_enum, return_correct_enums_for_keywords) {
 		{"size", SIZE}
 	};
 
-	size_t keyword_count = sizeof(keywords_and_expected_enums)/sizeof(struct keyword_and_expected_enum);
+	size_t keyword_count = ARRAY_COUNT(keywords_and_expected_enums);
 
 	char *keyword;
 	enum aes expected_enum;

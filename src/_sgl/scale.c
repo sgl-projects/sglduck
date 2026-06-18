@@ -1,3 +1,4 @@
+#include"array.h"
 #include"scale.h"
 #include"keyword.h"
 
@@ -7,7 +8,7 @@ static struct keyword_enum_row scale_keyword_enum_table[] = {
   {"log", LOG}
 };
 
-static int scale_count = KEYWORD_COUNT(scale_keyword_enum_table);
+static int scale_count = ARRAY_COUNT(scale_keyword_enum_table);
 
 int valid_scale_str(const char *scale_str) {
   return valid_keyword_str(scale_str, scale_keyword_enum_table, scale_count);

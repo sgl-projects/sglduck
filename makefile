@@ -41,22 +41,22 @@ $(SRC)/%.o: $(SRC)/%.c
 $(TEST)/test_sgl_to_cgs.o: $(TEST)/test_sgl_to_cgs.c $(SRC)/aes.h $(SRC)/direction.h $(SRC)/qual.h $(SRC)/sgl_to_cgs.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_sgl_to_cgs.o -c $(TEST)/test_sgl_to_cgs.c -I./$(SRC)
 
-$(TEST)/test_aes.o: $(TEST)/test_aes.c $(SRC)/aes.h $(SRC)/keyword.h
+$(TEST)/test_aes.o: $(TEST)/test_aes.c $(SRC)/aes.h $(SRC)/keyword.h $(SRC)/array.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_aes.o -c $(TEST)/test_aes.c -I./$(SRC)
 
 $(TEST)/test_geom.o: $(TEST)/test_geom.c $(SRC)/geom.h $(SRC)/keyword.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_geom.o -c $(TEST)/test_geom.c -I./$(SRC)
 
-$(TEST)/test_cta.o: $(TEST)/test_cta.c $(SRC)/cta.h $(SRC)/keyword.h
+$(TEST)/test_cta.o: $(TEST)/test_cta.c $(SRC)/cta.h $(SRC)/keyword.h $(SRC)/array.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_cta.o -c $(TEST)/test_cta.c -I./$(SRC)
 
 $(TEST)/test_qual.o: $(TEST)/test_qual.c $(SRC)/qual.h $(SRC)/keyword.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_qual.o -c $(TEST)/test_qual.c -I./$(SRC)
 
-$(TEST)/test_scale.o: $(TEST)/test_scale.c $(SRC)/scale.h $(SRC)/keyword.h
+$(TEST)/test_scale.o: $(TEST)/test_scale.c $(SRC)/scale.h $(SRC)/keyword.h $(SRC)/array.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_scale.o -c $(TEST)/test_scale.c -I./$(SRC)
 
-$(TEST)/test_keyword.o: $(TEST)/test_keyword.c $(SRC)/keyword.h
+$(TEST)/test_keyword.o: $(TEST)/test_keyword.c $(SRC)/keyword.h $(SRC)/array.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_keyword.o -c $(TEST)/test_keyword.c -I./$(SRC)
 
 $(TEST)/test_title.o: $(TEST)/test_title.c $(SRC)/title.h $(SRC)/aes.h $(SRC)/cgs.h
