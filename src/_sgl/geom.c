@@ -1,3 +1,4 @@
+#include"array.h"
 #include"geom.h"
 #include"keyword.h"
 
@@ -12,7 +13,7 @@ static struct keyword_enum_row geom_keyword_enum_table[] = {
 	{"boxes", BOX}
 };
 
-static int geom_count = KEYWORD_COUNT(geom_keyword_enum_table);
+static int geom_count = ARRAY_COUNT(geom_keyword_enum_table);
 
 int valid_geom_str(const char *geom_str) {
   return valid_keyword_str(geom_str, geom_keyword_enum_table, geom_count);

@@ -1,3 +1,4 @@
+#include"array.h"
 #include"aes.h"
 #include"keyword.h"
 
@@ -10,7 +11,7 @@ static struct keyword_enum_row aes_keyword_enum_table[] = {
 	{"size", SIZE}
 };
 
-static int aes_count = KEYWORD_COUNT(aes_keyword_enum_table);
+static int aes_count = ARRAY_COUNT(aes_keyword_enum_table);
 
 int valid_aes_str(const char *aes_str) {
 	return valid_keyword_str(aes_str, aes_keyword_enum_table, aes_count);

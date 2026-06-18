@@ -1,11 +1,12 @@
 #include<criterion/criterion.h>
+#include<array.h>
 #include<keyword.h>
 
 static struct keyword_enum_row keyword_enum_table[] = {
 	{"a", 1},
 	{"b", 99}
 };
-static int keyword_count = KEYWORD_COUNT(keyword_enum_table);
+static int keyword_count = ARRAY_COUNT(keyword_enum_table);
 
 Test(valid_keyword_str, considers_null_ptr_invalid) {
 	char *null_ptr = NULL;
