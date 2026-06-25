@@ -1,11 +1,8 @@
-"""Tests for SglScaleLn.
-
-``lets_plot_scales`` requires the full pgs and belongs to the rendering
-milestone, so it is not ported here yet.
-"""
+"""Tests for SglScaleLn."""
 
 import re
 
+import lets_plot
 import numpy as np
 import polars as pl
 import pytest
@@ -222,4 +219,39 @@ def test_apply_scale_inverse_returns_e_to_the_power():
     expected = np.array([10.0, np.nan, 27.5])
     np.testing.assert_allclose(
         SglScaleLn().apply_scale_inverse(values), expected, equal_nan=True
+    )
+
+
+def _as_dicts(scales):
+    return [scale.as_dict() for scale in scales]
+
+
+@pytest.mark.parametrize(
+    "aes,scale_ctor",
+    [
+        ("x", lets_plot.scale_x_continuous),
+        ("y", lets_plot.scale_y_continuous),
+        ("theta", lets_plot.scale_x_continuous),
+        ("r", lets_plot.scale_y_continuous),
+        ("size", lets_plot.scale_size),
+    ],
+)
+def test_lets_plot_scales_for_non_color_aes(aes, scale_ctor):
+    pgs = sgl_to_pgs(f"visualize hp as {aes} from cars using points")
+    assert _as_dicts(SglScaleLn().lets_plot_scales(aes, pgs)) == _as_dicts(
+        [scale_ctor(trans="log")]
+    )
+
+
+def test_lets_plot_scales_returns_color_scale_for_non_bar():
+    pgs = sgl_to_pgs("visualize hp as x, mpg as y, cyl as color from cars using points")
+    assert _as_dicts(SglScaleLn().lets_plot_scales("color", pgs)) == _as_dicts(
+        [lets_plot.scale_color_continuous(trans="log")]
+    )
+
+
+def test_lets_plot_scales_returns_fill_scale_for_bar():
+    pgs = sgl_to_pgs("visualize hp as x, mpg as y, cyl as color from cars using bars")
+    assert _as_dicts(SglScaleLn().lets_plot_scales("color", pgs)) == _as_dicts(
+        [lets_plot.scale_fill_continuous(trans="log")]
     )

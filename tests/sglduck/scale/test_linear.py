@@ -1,11 +1,8 @@
-"""Tests for SglScaleLinear.
-
-``lets_plot_scales`` requires the full pgs and belongs to the rendering
-milestone, so it is not ported here yet.
-"""
+"""Tests for SglScaleLinear."""
 
 import re
 
+import lets_plot
 import numpy as np
 import pytest
 
@@ -181,4 +178,39 @@ def test_apply_scale_inverse_returns_original_values():
     values = np.array([1.2, np.nan, 3.4])
     np.testing.assert_allclose(
         SglScaleLinear().apply_scale_inverse(values), values, equal_nan=True
+    )
+
+
+def _as_dicts(scales):
+    return [scale.as_dict() for scale in scales]
+
+
+@pytest.mark.parametrize(
+    "aes,scale_ctor",
+    [
+        ("x", lets_plot.scale_x_continuous),
+        ("y", lets_plot.scale_y_continuous),
+        ("theta", lets_plot.scale_x_continuous),
+        ("r", lets_plot.scale_y_continuous),
+        ("size", lets_plot.scale_size),
+    ],
+)
+def test_lets_plot_scales_for_non_color_aes(aes, scale_ctor):
+    pgs = sgl_to_pgs(f"visualize hp as {aes} from cars using points")
+    assert _as_dicts(SglScaleLinear().lets_plot_scales(aes, pgs)) == _as_dicts(
+        [scale_ctor(trans="identity")]
+    )
+
+
+def test_lets_plot_scales_returns_color_scale_for_non_bar():
+    pgs = sgl_to_pgs("visualize hp as x, mpg as y, cyl as color from cars using points")
+    assert _as_dicts(SglScaleLinear().lets_plot_scales("color", pgs)) == _as_dicts(
+        [lets_plot.scale_color_continuous(trans="identity")]
+    )
+
+
+def test_lets_plot_scales_returns_fill_scale_for_bar():
+    pgs = sgl_to_pgs("visualize hp as x, mpg as y, cyl as color from cars using bars")
+    assert _as_dicts(SglScaleLinear().lets_plot_scales("color", pgs)) == _as_dicts(
+        [lets_plot.scale_fill_continuous(trans="identity")]
     )
