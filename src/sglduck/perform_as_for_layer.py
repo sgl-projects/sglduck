@@ -10,8 +10,9 @@ rsgl's add-scale / summarize / back-scale sequence.
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
+from .cta import Aggregation
 from .scale import SglScaleLinear
 from .utils import filter_agg_exprs, filter_agg_mappings
 
@@ -35,19 +36,18 @@ def _needs_scale_mappings(layer: dict, scales: dict | None) -> dict:
 
 
 def add_scaled_cols(
-    layer: dict, scales: dict | None, df: pd.DataFrame
-) -> pd.DataFrame:
+    layer: dict, scales: dict | None, df: pl.DataFrame
+) -> pl.DataFrame:
     """Add a pre-scaled source column for each non-linearly scaled aggregation."""
     needs_scale_mappings = _needs_scale_mappings(layer, scales)
     if not needs_scale_mappings:
         return df
-    df = df.copy()
     for aes, col_expr in needs_scale_mappings.items():
         scale = scales[aes]
         existing_col = col_expr["column"]
         new_col = f"sglduck.{scale.sgl_func_name()}.{existing_col}"
         if new_col not in df.columns:
-            df[new_col] = scale.apply_scale(df[existing_col])
+            df = df.with_columns(scale.apply_scale(df[existing_col]).alias(new_col))
     return df
 
 
@@ -109,26 +109,34 @@ def group_by_col_names(
 
 
 def backscale_cols(
-    layer: dict, scales: dict | None, df: pd.DataFrame
-) -> pd.DataFrame:
+    layer: dict, scales: dict | None, df: pl.DataFrame
+) -> pl.DataFrame:
     """Map each non-linearly scaled aggregate back through the scale's inverse."""
     needs_scale_mappings = _needs_scale_mappings(layer, scales)
     if not needs_scale_mappings:
         return df
-    df = df.copy()
     backscaled: set[str] = set()
     for aes, col_expr in needs_scale_mappings.items():
         scale = scales[aes]
         col_name = col_expr["cta"].agg_col_name(col_expr, scale)
         if col_name not in backscaled:
-            df[col_name] = scale.apply_scale_inverse(df[col_name])
+            df = df.with_columns(
+                scale.apply_scale_inverse(df[col_name]).alias(col_name)
+            )
             backscaled.add(col_name)
     return df
 
 
+def _agg_expr(name: str, agg: Aggregation) -> pl.Expr:
+    """The polars aggregation expression for one summarize arg."""
+    if agg.func == "size":
+        return pl.len().alias(name)
+    return getattr(pl.col(agg.column), agg.func)().alias(name)
+
+
 def perform_as_for_layer(
-    layer: dict, df: pd.DataFrame, scales: dict | None
-) -> pd.DataFrame:
+    layer: dict, df: pl.DataFrame, scales: dict | None
+) -> pl.DataFrame:
     """Return the layer's DataFrame aggregated per its group-by columns."""
     aes_mappings = layer["aes_mappings"]
     aes_aggs = filter_agg_mappings(aes_mappings)
@@ -138,14 +146,10 @@ def perform_as_for_layer(
 
     scaled_df = add_scaled_cols(layer, scales, df)
     args = summarize_args(layer, scales)
+    agg_exprs = [_agg_expr(name, agg) for name, agg in args.items()]
 
     if "groupings" not in layer:
-        row = {
-            name: len(scaled_df) if agg.func == "size"
-            else scaled_df[agg.column].agg(agg.func)
-            for name, agg in args.items()
-        }
-        return pd.DataFrame([row])
+        return scaled_df.select(agg_exprs)
 
     group_by_cols = list(
         dict.fromkeys(
@@ -154,12 +158,6 @@ def perform_as_for_layer(
             for name in group_by_col_names(col_expr, aes_mappings, scales)
         )
     )
-    grouped = scaled_df.groupby(group_by_cols, dropna=False, sort=False)
-    summarized = {
-        name: grouped.size() if agg.func == "size"
-        else grouped[agg.column].agg(agg.func)
-        for name, agg in args.items()
-    }
-    agg_df = pd.concat(summarized, axis=1).reset_index()
+    agg_df = scaled_df.group_by(group_by_cols, maintain_order=True).agg(agg_exprs)
 
     return backscale_cols(layer, scales, agg_df)

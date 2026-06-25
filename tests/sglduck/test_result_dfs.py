@@ -1,6 +1,6 @@
 """Tests for ``result_dfs``."""
 
-import pandas as pd
+from polars.testing import assert_frame_equal
 import pytest
 
 from sglduck.pgs import sgl_to_pgs
@@ -18,8 +18,8 @@ def test_returns_correct_dataframe_for_table_name_source(test_con):
 
     actual_dfs = result_dfs(pgs, test_con)
 
-    expected_df = test_con.execute("select * from cars").df()
-    pd.testing.assert_frame_equal(actual_dfs[0], expected_df)
+    expected_df = test_con.execute("select * from cars").pl()
+    assert_frame_equal(actual_dfs[0], expected_df)
 
 
 def test_returns_correct_dataframe_for_subquery_source(test_con):
@@ -41,8 +41,8 @@ def test_returns_correct_dataframe_for_subquery_source(test_con):
         select *
         from cars
         where cyl = 4
-    """).df()
-    pd.testing.assert_frame_equal(actual_dfs[0], expected_df)
+    """).pl()
+    assert_frame_equal(actual_dfs[0], expected_df)
 
 
 def test_raises_error_if_table_doesnt_exist(test_con):
@@ -112,12 +112,12 @@ def test_returns_multiple_dfs_for_multiple_layers(test_con):
 
     actual_dfs = result_dfs(pgs, test_con)
 
-    expected_df_1 = test_con.execute("select * from cars").df()
+    expected_df_1 = test_con.execute("select * from cars").pl()
     expected_df_2 = test_con.execute("""
         select *
         from cars
         where cyl = 4
-    """).df()
+    """).pl()
     assert len(actual_dfs) == 2
-    pd.testing.assert_frame_equal(actual_dfs[0], expected_df_1)
-    pd.testing.assert_frame_equal(actual_dfs[1], expected_df_2)
+    assert_frame_equal(actual_dfs[0], expected_df_1)
+    assert_frame_equal(actual_dfs[1], expected_df_2)

@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from ..types import is_categorical_col, is_numerical_col, is_temporal_col
 
 
-def valid_column_class(column: str, df: pd.DataFrame) -> None:
+def valid_column_class(column: str, df: pl.DataFrame) -> None:
     """Raise if the column's SGL type classification is unknown."""
     if column == "*":
         return
@@ -22,7 +22,7 @@ def valid_column_class(column: str, df: pd.DataFrame) -> None:
     )
 
 
-def valid_column_classes(layer: dict, df: pd.DataFrame) -> None:
+def valid_column_classes(layer: dict, df: pl.DataFrame) -> None:
     """Raise if any column referenced by the layer has an unknown class."""
     all_col_exprs = [
         *layer["aes_mappings"].values(),

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from .base import SglCta
@@ -13,7 +13,7 @@ class SglCtaBin(SglCta):
     def sgl_func_name(self) -> str:
         return "bin"
 
-    def valid_cta(self, col_expr: dict, df: pd.DataFrame) -> None:
+    def valid_cta(self, col_expr: dict, df: pl.DataFrame) -> None:
         # sglduck.types imports sglduck.cta (via sglduck.utils), so import lazily
         from ..types import is_categorical_col
 
@@ -33,8 +33,8 @@ class SglCtaBin(SglCta):
             raise SglError("Error: number of bins must be greater than 0.")
 
     def add_transformed_column(
-        self, input_col_name: str, df: pd.DataFrame, scale, num_bins: int = 30
-    ) -> pd.DataFrame:
+        self, input_col_name: str, df: pl.DataFrame, scale, num_bins: int = 30
+    ) -> pl.DataFrame:
         """Return ``df`` with a binned column for ``input_col_name`` added.
 
         The new column is named ``sglduck.<scale>.bin.<num_bins>.<column>``; if a
@@ -47,9 +47,8 @@ class SglCtaBin(SglCta):
         )
         if new_col_name in df.columns:
             return df
-        df = df.copy()
-        df[new_col_name] = bin_values(df[input_col_name], num_bins, scale)
-        return df
+        binned = bin_values(df[input_col_name].to_numpy(), num_bins, scale)
+        return df.with_columns(pl.Series(new_col_name, binned))
 
     def is_aggregation(self) -> bool:
         return False

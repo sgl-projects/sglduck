@@ -2,7 +2,7 @@
 
 import re
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sglduck import SglError
@@ -22,7 +22,7 @@ def test_sgl_func_name_returns_count():
 def test_valid_cta_doesnt_raise_error_for_count_star():
     col_expr = {"column": "*", "cta": SglCtaCount()}
 
-    SglCtaCount().valid_cta(col_expr, pd.DataFrame())
+    SglCtaCount().valid_cta(col_expr, pl.DataFrame())
 
 
 def test_valid_cta_raises_error_for_non_star_column():
@@ -34,13 +34,13 @@ def test_valid_cta_raises_error_for_non_star_column():
             "Error: count can only be applied to *, found count(col_1)."
         ),
     ):
-        SglCtaCount().valid_cta(col_expr, pd.DataFrame())
+        SglCtaCount().valid_cta(col_expr, pl.DataFrame())
 
 
 def test_valid_cta_doesnt_raise_error_for_no_arg():
     col_expr = {"column": "*", "cta": SglCtaCount()}
 
-    SglCtaCount().valid_cta(col_expr, pd.DataFrame())
+    SglCtaCount().valid_cta(col_expr, pl.DataFrame())
 
 
 def test_valid_cta_raises_error_for_arg():
@@ -50,7 +50,7 @@ def test_valid_cta_raises_error_for_arg():
         SglError,
         match=re.escape("Error: count function received unexpected argument."),
     ):
-        SglCtaCount().valid_cta(col_expr, pd.DataFrame())
+        SglCtaCount().valid_cta(col_expr, pl.DataFrame())
 
 
 def test_is_aggregation_returns_true():

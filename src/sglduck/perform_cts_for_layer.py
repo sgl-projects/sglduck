@@ -11,14 +11,14 @@ the same (column, scale, bin-count) transform is never added twice.
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from .scale import SglScaleLinear
 
 
 def _add_trans_cols_from_aes(
-    aes_mappings: dict, df: pd.DataFrame, scales: dict | None
-) -> pd.DataFrame:
+    aes_mappings: dict, df: pl.DataFrame, scales: dict | None
+) -> pl.DataFrame:
     for aes, aes_mapping in aes_mappings.items():
         cta = aes_mapping["cta"]
         if not cta.is_transformation():
@@ -35,8 +35,8 @@ def _add_trans_cols_from_aes(
 
 
 def _add_trans_cols_from_col_exprs(
-    col_exprs: list[dict], df: pd.DataFrame
-) -> pd.DataFrame:
+    col_exprs: list[dict], df: pl.DataFrame
+) -> pl.DataFrame:
     for col_expr in col_exprs:
         cta = col_expr["cta"]
         if not cta.is_transformation():
@@ -51,8 +51,8 @@ def _add_trans_cols_from_col_exprs(
 
 
 def perform_cts_for_layer(
-    layer: dict, df: pd.DataFrame, scales: dict | None
-) -> pd.DataFrame:
+    layer: dict, df: pl.DataFrame, scales: dict | None
+) -> pl.DataFrame:
     """Return ``df`` with every transformed column the layer references added."""
     aes_mappings = layer["aes_mappings"]
     aes_values = list(aes_mappings.values())

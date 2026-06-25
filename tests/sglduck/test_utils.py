@@ -1,6 +1,6 @@
 """Tests for the pgs helper functions in ``utils``."""
 
-import pandas as pd
+from polars.testing import assert_series_equal
 import pytest
 
 from sglduck.cta import SglCtaAvg, SglCtaBin, SglCtaCount, SglCtaIdentity
@@ -185,4 +185,4 @@ def test_column_from_aes_returns_correct_column(test_con):
 
     actual_col = column_from_aes(layer, df, "x")
     expected_col = df["hp"]
-    pd.testing.assert_series_equal(actual_col, expected_col)
+    assert_series_equal(actual_col, expected_col)

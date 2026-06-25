@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..constants import POS_AES
 from ..errors import SglError
@@ -14,7 +14,7 @@ from ..types import (
 from ..utils import all_aesthetics
 
 
-def valid_layering_for_aes(pgs: dict, dfs: list[pd.DataFrame], aes: str) -> None:
+def valid_layering_for_aes(pgs: dict, dfs: list[pl.DataFrame], aes: str) -> None:
     """Raise if the aesthetic's layering is invalid."""
     if aes in POS_AES:
         if not all(aes in layer["aes_mappings"] for layer in pgs["layers"]):
@@ -52,7 +52,7 @@ def valid_layering_for_aes(pgs: dict, dfs: list[pd.DataFrame], aes: str) -> None
         )
 
 
-def valid_layering(pgs: dict, dfs: list[pd.DataFrame]) -> None:
+def valid_layering(pgs: dict, dfs: list[pl.DataFrame]) -> None:
     """Raise if any aesthetic is layered inconsistently."""
     for aes in all_aesthetics(pgs):
         valid_layering_for_aes(pgs, dfs, aes)

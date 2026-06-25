@@ -1,6 +1,6 @@
 """Tests for perform_ctas (port of test-perform_ctas.R)."""
 
-import pandas as pd
+from polars.testing import assert_frame_equal
 
 from sglduck.perform_as_for_layer import perform_as_for_layer
 from sglduck.perform_cts_for_layer import perform_cts_for_layer
@@ -10,17 +10,14 @@ from sglduck.result_dfs import result_dfs
 
 
 def _normalize(df):
-    df = df.reset_index(drop=True)
-    df = df.reindex(sorted(df.columns), axis=1)
-    if len(df.columns):
-        df = df.sort_values(list(df.columns), na_position="last", kind="stable")
-    return df.reset_index(drop=True)
+    df = df.select(sorted(df.columns))
+    if df.width:
+        df = df.sort(by=df.columns, nulls_last=True)
+    return df
 
 
 def _assert_equal(actual, expected):
-    pd.testing.assert_frame_equal(
-        _normalize(actual), _normalize(expected), check_dtype=False
-    )
+    assert_frame_equal(_normalize(actual), _normalize(expected), check_dtypes=False)
 
 
 def _expected_for_layer(layer, df, scales):

@@ -2,7 +2,7 @@
 
 import re
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sglduck import SglError
@@ -26,18 +26,18 @@ def test_valid_cta_raises_error_for_star():
         SglError,
         match=re.escape("Error: '*' cannot be used with the avg function."),
     ):
-        SglCtaAvg().valid_cta(col_expr, pd.DataFrame())
+        SglCtaAvg().valid_cta(col_expr, pl.DataFrame())
 
 
 def test_valid_cta_doesnt_raise_error_for_numerical_column(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaAvg()}
 
     SglCtaAvg().valid_cta(col_expr, df)
 
 
 def test_valid_cta_raises_error_for_temporal_column(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "day", "cta": SglCtaAvg()}
 
     with pytest.raises(
@@ -50,7 +50,7 @@ def test_valid_cta_raises_error_for_temporal_column(test_con):
 
 
 def test_valid_cta_raises_error_for_categorical_column(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "letter", "cta": SglCtaAvg()}
 
     with pytest.raises(
@@ -63,14 +63,14 @@ def test_valid_cta_raises_error_for_categorical_column(test_con):
 
 
 def test_valid_cta_doesnt_raise_error_for_no_arg(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaAvg()}
 
     SglCtaAvg().valid_cta(col_expr, df)
 
 
 def test_valid_cta_raises_error_for_arg(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaAvg(), "arg": 1}
 
     with pytest.raises(

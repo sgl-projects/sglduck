@@ -7,7 +7,7 @@ milestone, so it is not ported here yet.
 import re
 
 import numpy as np
-import pandas as pd
+import polars as pl
 import pytest
 
 from sglduck import SglError
@@ -187,10 +187,10 @@ def _non_pos_layers_and_dfs():
             regression line
         )
     """)
-    df_1 = pd.DataFrame(
+    df_1 = pl.DataFrame(
         {"col_1": [1.2, 3.4, np.nan], "col_2": [5.6, np.nan, 7.8]}
     )
-    df_2 = pd.DataFrame(
+    df_2 = pl.DataFrame(
         {"col_1": [1.2, 3.4, np.nan], "col_2": [5.6, np.nan, -7.8]}
     )
     return pgs["layers"], [df_1, df_2]

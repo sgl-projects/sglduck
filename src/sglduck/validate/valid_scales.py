@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 
-def valid_scales(pgs: dict, dfs: list[pd.DataFrame]) -> None:
+def valid_scales(pgs: dict, dfs: list[pl.DataFrame]) -> None:
     """Run each scale's scale-specific validation."""
     if "scales" not in pgs:
         return

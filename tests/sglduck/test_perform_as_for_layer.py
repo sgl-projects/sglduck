@@ -1,7 +1,8 @@
 """Tests for perform_as_for_layer (port of test-perform_as_for_layer.R)."""
 
 import numpy as np
-import pandas as pd
+import polars as pl
+from polars.testing import assert_frame_equal
 
 from sglduck.cta import Aggregation, SglCtaBin
 from sglduck.perform_as_for_layer import (
@@ -15,17 +16,14 @@ from sglduck.scale import SglScaleLinear
 
 
 def _normalize(df):
-    df = df.reset_index(drop=True)
-    df = df.reindex(sorted(df.columns), axis=1)
-    if len(df.columns):
-        df = df.sort_values(list(df.columns), na_position="last", kind="stable")
-    return df.reset_index(drop=True)
+    df = df.select(sorted(df.columns))
+    if df.width:
+        df = df.sort(by=df.columns, nulls_last=True)
+    return df
 
 
 def _assert_equal(actual, expected):
-    pd.testing.assert_frame_equal(
-        _normalize(actual), _normalize(expected), check_dtype=False
-    )
+    assert_frame_equal(_normalize(actual), _normalize(expected), check_dtypes=False)
 
 
 def _layer_and_df(sgl_stmt, test_con):
@@ -39,13 +37,15 @@ def _binned(column, df, scale, num_bins=30):
 
 
 def _grouped_summary(df, group_cols, aggs, backscale=()):
-    grouped = df.groupby(group_cols, dropna=False, sort=False)
-    cols = {}
+    exprs = []
     for name, (func, col) in aggs.items():
-        cols[name] = grouped.size() if func == "size" else grouped[col].agg(func)
-    out = pd.concat(cols, axis=1).reset_index()
+        if func == "size":
+            exprs.append(pl.len().alias(name))
+        else:
+            exprs.append(getattr(pl.col(col), func)().alias(name))
+    out = df.group_by(group_cols, maintain_order=True).agg(exprs)
     for name in backscale:
-        out[name] = np.power(10.0, out[name])
+        out = out.with_columns((10.0 ** pl.col(name)).alias(name))
     return out
 
 
@@ -74,7 +74,7 @@ class TestAddScaledCols:
             """,
             test_con,
         )
-        expected = df.assign(**{"sglduck.log.hp": np.log10(df["hp"])})
+        expected = df.with_columns(np.log10(df["hp"]).alias("sglduck.log.hp"))
         _assert_equal(add_scaled_cols(layer, scales, df), expected)
 
     def test_multiple_distinct_scaled_aggs(self, test_con):
@@ -85,8 +85,9 @@ class TestAddScaledCols:
             """,
             test_con,
         )
-        expected = df.assign(
-            **{"sglduck.log.hp": np.log10(df["hp"]), "sglduck.log.cyl": np.log10(df["cyl"])}
+        expected = df.with_columns(
+            np.log10(df["hp"]).alias("sglduck.log.hp"),
+            np.log10(df["cyl"]).alias("sglduck.log.cyl"),
         )
         _assert_equal(add_scaled_cols(layer, scales, df), expected)
 
@@ -98,7 +99,7 @@ class TestAddScaledCols:
             """,
             test_con,
         )
-        expected = df.assign(**{"sglduck.log.hp": np.log10(df["hp"])})
+        expected = df.with_columns(np.log10(df["hp"]).alias("sglduck.log.hp"))
         _assert_equal(add_scaled_cols(layer, scales, df), expected)
 
     def test_multiple_scale_types_no_duplication(self, test_con):
@@ -110,8 +111,9 @@ class TestAddScaledCols:
             """,
             test_con,
         )
-        expected = df.assign(
-            **{"sglduck.log.hp": np.log10(df["hp"]), "sglduck.ln.hp": np.log(df["hp"])}
+        expected = df.with_columns(
+            np.log10(df["hp"]).alias("sglduck.log.hp"),
+            np.log(df["hp"]).alias("sglduck.ln.hp"),
         )
         _assert_equal(add_scaled_cols(layer, scales, df), expected)
 
@@ -210,8 +212,8 @@ class TestPerformAsForLayer:
             "visualize count(*) as x from cars collect by avg(mpg) using lines",
             test_con,
         )
-        expected = pd.DataFrame(
-            [{"sglduck.count": len(df), "sglduck.linear.avg.mpg": df["mpg"].mean()}]
+        expected = pl.DataFrame(
+            {"sglduck.count": [len(df)], "sglduck.linear.avg.mpg": [df["mpg"].mean()]}
         )
         _assert_equal(perform_as_for_layer(layer, df, scales), expected)
 
@@ -418,7 +420,7 @@ class TestPerformAsForLayer:
             """,
             test_con,
         )
-        scaled = df.assign(**{"sglduck.log.cyl": np.log10(df["cyl"])})
+        scaled = df.with_columns(np.log10(df["cyl"]).alias("sglduck.log.cyl"))
         expected = _grouped_summary(
             scaled,
             ["hp", "mpg"],
@@ -438,7 +440,7 @@ class TestPerformAsForLayer:
             """,
             test_con,
         )
-        scaled = df.assign(**{"sglduck.log.cyl": np.log10(df["cyl"])})
+        scaled = df.with_columns(np.log10(df["cyl"]).alias("sglduck.log.cyl"))
         expected = _grouped_summary(
             scaled,
             ["hp", "mpg"],

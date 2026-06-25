@@ -3,7 +3,7 @@
 import re
 
 import numpy as np
-import pandas as pd
+import polars as pl
 import pytest
 
 from sglduck import SglError
@@ -27,25 +27,25 @@ def test_valid_cta_raises_error_for_star():
         SglError,
         match=re.escape("Error: '*' can only be used inside an aggregation function"),
     ):
-        SglCtaBin().valid_cta(col_expr, pd.DataFrame())
+        SglCtaBin().valid_cta(col_expr, pl.DataFrame())
 
 
 def test_valid_cta_doesnt_raise_error_for_numerical_column(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaBin()}
 
     SglCtaBin().valid_cta(col_expr, df)
 
 
 def test_valid_cta_doesnt_raise_error_for_temporal_column(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "day", "cta": SglCtaBin()}
 
     SglCtaBin().valid_cta(col_expr, df)
 
 
 def test_valid_cta_raises_error_for_categorical_column(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "letter", "cta": SglCtaBin()}
 
     with pytest.raises(
@@ -58,21 +58,21 @@ def test_valid_cta_raises_error_for_categorical_column(test_con):
 
 
 def test_valid_cta_doesnt_raise_error_for_no_arg(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaBin()}
 
     SglCtaBin().valid_cta(col_expr, df)
 
 
 def test_valid_cta_doesnt_raise_error_for_arg_value_greater_than_zero(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaBin(), "arg": 1}
 
     SglCtaBin().valid_cta(col_expr, df)
 
 
 def test_valid_cta_raises_error_for_arg_value_of_zero(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaBin(), "arg": 0}
 
     with pytest.raises(
@@ -83,7 +83,7 @@ def test_valid_cta_raises_error_for_arg_value_of_zero(test_con):
 
 
 def test_valid_cta_raises_error_for_negative_arg_value(test_con):
-    df = test_con.execute("select * from synth").df()
+    df = test_con.execute("select * from synth").pl()
     col_expr = {"column": "number", "cta": SglCtaBin(), "arg": -1}
 
     with pytest.raises(
@@ -94,7 +94,7 @@ def test_valid_cta_raises_error_for_negative_arg_value(test_con):
 
 
 def test_add_transformed_column_adds_correct_values_for_linear_scale():
-    df = pd.DataFrame({"col_1": np.arange(0, 11)})
+    df = pl.DataFrame({"col_1": np.arange(0, 11)})
     expected = [0.992, 0.992, 2.996, 2.996, 5, 5, 5, 7.004, 7.004, 9.008, 9.008]
 
     result = SglCtaBin().add_transformed_column(
@@ -105,7 +105,7 @@ def test_add_transformed_column_adds_correct_values_for_linear_scale():
 
 
 def test_add_transformed_column_adds_correct_values_for_log_scale():
-    df = pd.DataFrame({"col_1": np.power(10.0, np.arange(0, 11))})
+    df = pl.DataFrame({"col_1": np.power(10.0, np.arange(0, 11))})
     expected = np.power(
         10.0, [0.992, 0.992, 2.996, 2.996, 5, 5, 5, 7.004, 7.004, 9.008, 9.008]
     )
@@ -116,23 +116,23 @@ def test_add_transformed_column_adds_correct_values_for_log_scale():
 
 
 def test_add_transformed_column_uses_30_bins_by_default():
-    df = pd.DataFrame({"col_1": np.arange(0, 101)})
+    df = pl.DataFrame({"col_1": np.arange(0, 101)})
 
     result = SglCtaBin().add_transformed_column("col_1", df, SglScaleLinear())
 
-    assert result["sglduck.linear.bin.30.col_1"].nunique() == 30
+    assert result["sglduck.linear.bin.30.col_1"].n_unique() == 30
 
 
 def test_add_transformed_column_doesnt_modify_column_if_already_exists():
-    df = pd.DataFrame({"sglduck.linear.bin.30.col_1": [0]})
+    df = pl.DataFrame({"sglduck.linear.bin.30.col_1": [0]})
 
     result = SglCtaBin().add_transformed_column("col_1", df, SglScaleLinear())
 
-    assert result["sglduck.linear.bin.30.col_1"].tolist() == [0]
+    assert result["sglduck.linear.bin.30.col_1"].to_list() == [0]
 
 
 def test_add_transformed_column_doesnt_mutate_input_df():
-    df = pd.DataFrame({"col_1": np.arange(0, 11)})
+    df = pl.DataFrame({"col_1": np.arange(0, 11)})
 
     SglCtaBin().add_transformed_column("col_1", df, SglScaleLinear())
 
@@ -140,7 +140,7 @@ def test_add_transformed_column_doesnt_mutate_input_df():
 
 
 def test_add_transformed_column_requires_a_scale():
-    df = pd.DataFrame({"col_1": [0]})
+    df = pl.DataFrame({"col_1": [0]})
 
     with pytest.raises(TypeError):
         SglCtaBin().add_transformed_column("col_1", df)

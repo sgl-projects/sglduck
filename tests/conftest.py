@@ -7,10 +7,12 @@ economics, and diamonds datasets are vendored as CSV files under ``tests/data``.
 
 from __future__ import annotations
 
+import datetime
+
 from pathlib import Path
 
 import duckdb
-import pandas as pd
+import polars as pl
 import pytest
 
 _DATA_DIR = Path(__file__).parent / "data"
@@ -20,16 +22,18 @@ def create_con_and_load_data():
     """Create a DuckDB connection and load the test tables."""
     con = duckdb.connect()
 
-    _write_table(con, "cars", pd.read_csv(_DATA_DIR / "mtcars.csv"))
+    _write_table(con, "cars", pl.read_csv(_DATA_DIR / "mtcars.csv"))
     _write_table(
-        con, "economics", pd.read_csv(_DATA_DIR / "economics.csv", parse_dates=["date"])
+        con,
+        "economics",
+        pl.read_csv(_DATA_DIR / "economics.csv", try_parse_dates=True),
     )
 
     # synth carries a DATE column (``day``) and a TIMESTAMP column
     # (``day_and_time``) sharing the same instants, for the date-vs-timestamp
     # reconciliation tests; both step by 10 years from 1950-01-01.
-    instants = pd.date_range("1950-01-01", periods=6, freq="10YS")
-    synth = pd.DataFrame(
+    instants = [datetime.datetime(1950 + 10 * i, 1, 1) for i in range(6)]
+    synth = pl.DataFrame(
         {
             "letter": list("abc") * 2,
             "number": range(1, 7),
@@ -53,11 +57,11 @@ def create_con_and_load_data():
     )
     con.unregister("synth_df")
 
-    _write_table(con, "diamonds", pd.read_csv(_DATA_DIR / "diamonds.csv"))
+    _write_table(con, "diamonds", pl.read_csv(_DATA_DIR / "diamonds.csv"))
     return con
 
 
-def _write_table(con, name: str, df: pd.DataFrame) -> None:
+def _write_table(con, name: str, df: pl.DataFrame) -> None:
     con.register(f"{name}_df", df)
     con.execute(f"create table {name} as select * from {name}_df")
     con.unregister(f"{name}_df")
@@ -74,9 +78,9 @@ def test_con():
 def synth_with_blob_col(test_con):
     """Temporarily add a BLOB column (unknown SGL classification) to synth.
 
-    Cleanup is add/drop rather than begin/rollback because pandas runs its
-    queries on cursors, which are separate DuckDB connections that wouldn't
-    see an uncommitted transaction.
+    Cleanup is an explicit add/drop of the column rather than wrapping the
+    test in a transaction, keeping the fixture independent of DuckDB's
+    transaction state.
     """
     test_con.execute("alter table synth add column blob_col BLOB")
     yield test_con

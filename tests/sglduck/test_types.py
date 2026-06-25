@@ -2,8 +2,8 @@
 
 import datetime
 
-import pandas as pd
-import pandas.api.types as pdt
+import polars as pl
+from polars.testing import assert_frame_equal
 import pytest
 
 from sglduck.pgs import sgl_to_pgs
@@ -23,35 +23,34 @@ from sglduck.types import (
 )
 
 
-def df_with_supported_pandas_types():
-    df = pd.DataFrame(
+def df_with_supported_polars_types():
+    df = pl.DataFrame(
         {
             "float_col": [1.2],
             "bool_col": [True],
             "date_col": [datetime.date(2025, 1, 1)],
             "int_col": [1],
-            "timedelta_col": [pd.Timedelta(days=1)],
-            "datetime_col": [pd.Timestamp("2025-01-01 00:00:00")],
+            "timedelta_col": [datetime.timedelta(days=1)],
+            "datetime_col": [datetime.datetime(2025, 1, 1, 0, 0, 0)],
             "str_col": ["1"],
-            "category_col": pd.Categorical(["a"]),
+            "category_col": ["a"],
         }
-    )
+    ).with_columns(pl.col("category_col").cast(pl.Categorical))
 
-    assert df["float_col"].dtype == "float64"
-    assert df["bool_col"].dtype == "bool"
-    assert df["date_col"].dtype == "object"
-    assert isinstance(df["date_col"].iloc[0], datetime.date)
-    assert df["int_col"].dtype == "int64"
-    assert pdt.is_timedelta64_dtype(df["timedelta_col"].dtype)
-    assert pdt.is_datetime64_any_dtype(df["datetime_col"].dtype)
-    assert pdt.is_string_dtype(df["str_col"])
-    assert isinstance(df["category_col"].dtype, pd.CategoricalDtype)
+    assert df["float_col"].dtype == pl.Float64
+    assert df["bool_col"].dtype == pl.Boolean
+    assert df["date_col"].dtype == pl.Date
+    assert df["int_col"].dtype == pl.Int64
+    assert df["timedelta_col"].dtype == pl.Duration
+    assert df["datetime_col"].dtype == pl.Datetime
+    assert df["str_col"].dtype == pl.String
+    assert df["category_col"].dtype == pl.Categorical
 
     return df
 
 
 def test_is_numerical_col_determines_whether_column_is_numerical():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
 
     assert is_numerical_col(df["float_col"]) is True
     assert is_numerical_col(df["bool_col"]) is False
@@ -64,7 +63,7 @@ def test_is_numerical_col_determines_whether_column_is_numerical():
 
 
 def test_is_categorical_col_determines_whether_column_is_categorical():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
 
     assert is_categorical_col(df["float_col"]) is False
     assert is_categorical_col(df["bool_col"]) is True
@@ -77,7 +76,7 @@ def test_is_categorical_col_determines_whether_column_is_categorical():
 
 
 def test_is_date_col_determines_whether_column_is_a_date():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
 
     assert is_date_col(df["float_col"]) is False
     assert is_date_col(df["bool_col"]) is False
@@ -90,7 +89,7 @@ def test_is_date_col_determines_whether_column_is_a_date():
 
 
 def test_is_timestamp_col_determines_whether_column_is_a_timestamp():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
 
     assert is_timestamp_col(df["float_col"]) is False
     assert is_timestamp_col(df["bool_col"]) is False
@@ -103,7 +102,7 @@ def test_is_timestamp_col_determines_whether_column_is_a_timestamp():
 
 
 def test_is_temporal_col_determines_whether_column_is_temporal():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
 
     assert is_temporal_col(df["float_col"]) is False
     assert is_temporal_col(df["bool_col"]) is False
@@ -116,7 +115,7 @@ def test_is_temporal_col_determines_whether_column_is_temporal():
 
 
 def test_is_numerical_mapping_returns_true_for_count_star():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             bin(float_col) as x,
@@ -131,7 +130,7 @@ def test_is_numerical_mapping_returns_true_for_count_star():
 
 
 def test_is_numerical_mapping_determines_whether_mapping_to_column_is_numerical():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             float_col as x,
@@ -147,7 +146,7 @@ def test_is_numerical_mapping_determines_whether_mapping_to_column_is_numerical(
 
 
 def test_is_categorical_mapping_returns_false_for_count_star():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             bin(float_col) as x,
@@ -162,7 +161,7 @@ def test_is_categorical_mapping_returns_false_for_count_star():
 
 
 def test_is_categorical_mapping_determines_whether_mapping_to_column_is_categorical():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             float_col as x,
@@ -178,7 +177,7 @@ def test_is_categorical_mapping_determines_whether_mapping_to_column_is_categori
 
 
 def test_is_date_mapping_returns_false_for_count_star():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             bin(float_col) as x,
@@ -193,7 +192,7 @@ def test_is_date_mapping_returns_false_for_count_star():
 
 
 def test_is_date_mapping_determines_whether_mapping_to_column_is_date():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             float_col as x,
@@ -211,7 +210,7 @@ def test_is_date_mapping_determines_whether_mapping_to_column_is_date():
 
 
 def test_is_timestamp_mapping_returns_false_for_count_star():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             bin(float_col) as x,
@@ -226,7 +225,7 @@ def test_is_timestamp_mapping_returns_false_for_count_star():
 
 
 def test_is_timestamp_mapping_determines_whether_mapping_to_column_is_timestamp():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             float_col as x,
@@ -244,7 +243,7 @@ def test_is_timestamp_mapping_determines_whether_mapping_to_column_is_timestamp(
 
 
 def test_is_temporal_mapping_returns_false_for_count_star():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             bin(float_col) as x,
@@ -259,7 +258,7 @@ def test_is_temporal_mapping_returns_false_for_count_star():
 
 
 def test_is_temporal_mapping_determines_whether_mapping_to_column_is_temporal():
-    df = df_with_supported_pandas_types()
+    df = df_with_supported_polars_types()
     pgs = sgl_to_pgs("""
         visualize
             float_col as x,
@@ -303,16 +302,15 @@ def test_type_classifications_raises_error_if_table_doesnt_exist(test_con):
 
 
 def test_type_classifications_returns_correct_classes_for_table_cols(test_con):
-    # Cleanup is by explicit drop rather than transaction rollback: pandas
-    # queries through con.cursor(), and a DuckDB cursor is a separate
-    # connection that cannot see another connection's open transaction.
+    # Cleanup is an explicit drop of the column rather than a transaction
+    # rollback, keeping the test independent of DuckDB's transaction state.
     test_con.execute("alter table synth add column blob_col BLOB")
     try:
         actual = type_classifications(test_con, "synth")
     finally:
         test_con.execute("alter table synth drop column blob_col")
 
-    expected = pd.DataFrame(
+    expected = pl.DataFrame(
         {
             "column_name": [
                 "letter", "number", "day",
@@ -324,12 +322,10 @@ def test_type_classifications_returns_correct_classes_for_table_cols(test_con):
             ],
         }
     )
-    pd.testing.assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected)
 
 
 def test_type_classifications_handles_table_names_needing_quoting(test_con):
-    # pandas gets no driver type information for an empty result set, so the
-    # table needs a row to classify from.
     test_con.execute('create table "weird-name" (a INTEGER, b VARCHAR)')
     test_con.execute("insert into \"weird-name\" values (1, 'x')")
     try:
@@ -337,10 +333,10 @@ def test_type_classifications_handles_table_names_needing_quoting(test_con):
     finally:
         test_con.execute('drop table "weird-name"')
 
-    expected = pd.DataFrame(
+    expected = pl.DataFrame(
         {
             "column_name": ["a", "b"],
             "column_class": ["numerical", "categorical"],
         }
     )
-    pd.testing.assert_frame_equal(actual, expected)
+    assert_frame_equal(actual, expected)

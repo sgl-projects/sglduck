@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from .valid_aesthetics import valid_aesthetics
 from .valid_collections import valid_collections
@@ -17,7 +17,7 @@ from .valid_scales import valid_scales
 from .valid_titles import valid_titles
 
 
-def validate_semantics(pgs: dict, dfs: list[pd.DataFrame]) -> None:
+def validate_semantics(pgs: dict, dfs: list[pl.DataFrame]) -> None:
     """Raise SglError if the pgs fails any semantic validation."""
     for layer, df in zip(pgs["layers"], dfs):
         valid_column_refs(layer, df)

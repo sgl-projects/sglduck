@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 
 
-def column_exists(col_exprs: list[dict], df: pd.DataFrame) -> dict[str, bool]:
+def column_exists(col_exprs: list[dict], df: pl.DataFrame) -> dict[str, bool]:
     """Map each unique referenced column to whether it exists in the df."""
     refs = dict.fromkeys(col_expr["column"] for col_expr in col_exprs)
     results = {ref: ref in df.columns for ref in refs}
@@ -16,7 +16,7 @@ def column_exists(col_exprs: list[dict], df: pd.DataFrame) -> dict[str, bool]:
     return results
 
 
-def raise_if_col_missing(col_exprs: list[dict], df: pd.DataFrame) -> None:
+def raise_if_col_missing(col_exprs: list[dict], df: pl.DataFrame) -> None:
     """Raise if any of the col_exprs reference a column the df lacks."""
     exists_results = column_exists(col_exprs, df)
     missing_col_names = [
@@ -28,7 +28,7 @@ def raise_if_col_missing(col_exprs: list[dict], df: pd.DataFrame) -> None:
         )
 
 
-def valid_column_refs(layer: dict, df: pd.DataFrame) -> None:
+def valid_column_refs(layer: dict, df: pl.DataFrame) -> None:
     """Raise if any clause of the layer references a missing column."""
     for col_exprs in (
         list(layer["aes_mappings"].values()),

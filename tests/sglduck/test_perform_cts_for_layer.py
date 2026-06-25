@@ -1,6 +1,6 @@
 """Tests for perform_cts_for_layer (port of test-perform_cts_for_layer.R)."""
 
-import pandas as pd
+from polars.testing import assert_frame_equal
 
 from sglduck.cta import SglCtaBin
 from sglduck.perform_cts_for_layer import perform_cts_for_layer
@@ -20,7 +20,7 @@ def _binned(column, df, scale, num_bins=30):
 
 
 def _assert_equal(actual, expected):
-    pd.testing.assert_frame_equal(actual, expected, check_like=True)
+    assert_frame_equal(actual, expected, check_column_order=False)
 
 
 class TestNoTransformations:

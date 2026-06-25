@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from .base import Aggregation, SglCta
@@ -13,7 +13,7 @@ class SglCtaAvg(SglCta):
     def sgl_func_name(self) -> str:
         return "avg"
 
-    def valid_cta(self, col_expr: dict, df: pd.DataFrame) -> None:
+    def valid_cta(self, col_expr: dict, df: pl.DataFrame) -> None:
         # sglduck.types imports sglduck.cta (via sglduck.utils), so import lazily
         from ..types import is_numerical_col
 
