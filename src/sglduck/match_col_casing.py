@@ -13,32 +13,32 @@ semantic validation.
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 
-def col_has_match_in_df(col_expr: dict, df: pd.DataFrame) -> bool:
+def col_has_match_in_df(col_expr: dict, df: pl.DataFrame) -> bool:
     """Whether the col_expr's column matches a df column, ignoring case."""
     return col_expr["column"].lower() in [name.lower() for name in df.columns]
 
 
-def facet_has_match_in_df(facet_expr: dict, df: pd.DataFrame) -> bool:
+def facet_has_match_in_df(facet_expr: dict, df: pl.DataFrame) -> bool:
     """Whether the facet's column matches a df column, ignoring case."""
     return facet_expr["column"].lower() in [name.lower() for name in df.columns]
 
 
-def _first_matching_name(col_name: str, df: pd.DataFrame) -> str:
+def _first_matching_name(col_name: str, df: pl.DataFrame) -> str:
     """The first df column name matching col_name, ignoring case."""
     return next(name for name in df.columns if name.lower() == col_name.lower())
 
 
-def match_col_to_df(col_expr: dict, df: pd.DataFrame) -> dict:
+def match_col_to_df(col_expr: dict, df: pl.DataFrame) -> dict:
     """Rewrite the col_expr's column to its df casing if one matches."""
     if not col_has_match_in_df(col_expr, df):
         return col_expr
     return {**col_expr, "column": _first_matching_name(col_expr["column"], df)}
 
 
-def match_facet_to_df(facet_expr: dict, df: pd.DataFrame) -> dict:
+def match_facet_to_df(facet_expr: dict, df: pl.DataFrame) -> dict:
     """Rewrite the facet's column to its df casing."""
     return {
         **facet_expr,
@@ -46,7 +46,7 @@ def match_facet_to_df(facet_expr: dict, df: pd.DataFrame) -> dict:
     }
 
 
-def match_cols_to_df(col_exprs, df: pd.DataFrame):
+def match_cols_to_df(col_exprs, df: pl.DataFrame):
     """Rewrite each col_expr's column to df casing where one matches.
 
     Accepts either a dict of aesthetic name -> col_expr (``aes_mappings``) or a
@@ -60,7 +60,7 @@ def match_cols_to_df(col_exprs, df: pd.DataFrame):
     return [match_col_to_df(col_expr, df) for col_expr in col_exprs]
 
 
-def match_col_casing_for_layer(layer: dict, df: pd.DataFrame) -> dict:
+def match_col_casing_for_layer(layer: dict, df: pl.DataFrame) -> dict:
     """Rewrite a layer's aes, grouping, and collection columns to df casing."""
     matched = {**layer, "aes_mappings": match_cols_to_df(layer["aes_mappings"], df)}
     if "groupings" in matched:
@@ -70,7 +70,7 @@ def match_col_casing_for_layer(layer: dict, df: pd.DataFrame) -> dict:
     return matched
 
 
-def match_col_casing_for_facet(facet_expr: dict, dfs: list[pd.DataFrame]) -> dict:
+def match_col_casing_for_facet(facet_expr: dict, dfs: list[pl.DataFrame]) -> dict:
     """Rewrite a facet's column to the casing of the first df that matches."""
     for df in dfs:
         if facet_has_match_in_df(facet_expr, df):
@@ -79,7 +79,7 @@ def match_col_casing_for_facet(facet_expr: dict, dfs: list[pd.DataFrame]) -> dic
 
 
 def match_col_casing_for_layers(
-    layers: list[dict], dfs: list[pd.DataFrame]
+    layers: list[dict], dfs: list[pl.DataFrame]
 ) -> list[dict]:
     """Rewrite each layer's columns to the casing of its own data source."""
     return [
@@ -89,13 +89,13 @@ def match_col_casing_for_layers(
 
 
 def match_col_casing_for_facets(
-    facets: list[dict], dfs: list[pd.DataFrame]
+    facets: list[dict], dfs: list[pl.DataFrame]
 ) -> list[dict]:
     """Rewrite each facet's column to the casing of a matching data source."""
     return [match_col_casing_for_facet(facet, dfs) for facet in facets]
 
 
-def match_col_casing(pgs: dict, dfs: list[pd.DataFrame]) -> dict:
+def match_col_casing(pgs: dict, dfs: list[pl.DataFrame]) -> dict:
     """Rewrite all column references in the pgs to their stored df casing."""
     matched = {**pgs, "layers": match_col_casing_for_layers(pgs["layers"], dfs)}
     if "facets" in matched:

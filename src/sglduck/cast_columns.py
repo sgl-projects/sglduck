@@ -1,22 +1,21 @@
 """Reconcile date and timestamp columns across layers before rendering.
 
-pandas has no first-class pure-date dtype: DB drivers return DATE columns as
-object-dtype ``datetime.date`` values and TIMESTAMP columns as ``datetime64``.
-When a single aesthetic maps to a date in one layer and a timestamp in another,
-the dates must be promoted to datetimes so the layers share a comparable axis.
-``cast_columns`` finds such aesthetics and casts their date columns to
-datetimes; casting a column that is already a timestamp is a no-op.
+polars distinguishes ``pl.Date`` (a calendar date) from ``pl.Datetime`` (an
+instant). When a single aesthetic maps to a date in one layer and a timestamp
+in another, the dates must be promoted to datetimes so the layers share a
+comparable axis. ``cast_columns`` finds such aesthetics and casts their date
+columns to datetimes; casting a column that is already a timestamp is a no-op.
 """
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from .types import is_date_mapping, is_timestamp_mapping
 from .utils import all_aesthetics
 
 
-def aes_has_dt_and_ts(aes: str, layers: list[dict], dfs: list[pd.DataFrame]) -> bool:
+def aes_has_dt_and_ts(aes: str, layers: list[dict], dfs: list[pl.DataFrame]) -> bool:
     """Whether the aesthetic maps to a date in some layer and a timestamp in another."""
     dt_found = False
     ts_found = False
@@ -29,7 +28,7 @@ def aes_has_dt_and_ts(aes: str, layers: list[dict], dfs: list[pd.DataFrame]) -> 
     return dt_found and ts_found
 
 
-def aes_with_dt_and_ts(pgs: dict, dfs: list[pd.DataFrame]) -> list[str]:
+def aes_with_dt_and_ts(pgs: dict, dfs: list[pl.DataFrame]) -> list[str]:
     """Return the aesthetics that map to both a date and a timestamp across layers."""
     return [
         aes
@@ -39,8 +38,8 @@ def aes_with_dt_and_ts(pgs: dict, dfs: list[pd.DataFrame]) -> list[str]:
 
 
 def cast_for_aes(
-    aes: str, layers: list[dict], dfs: list[pd.DataFrame]
-) -> list[pd.DataFrame]:
+    aes: str, layers: list[dict], dfs: list[pl.DataFrame]
+) -> list[pl.DataFrame]:
     """Cast the aesthetic's column to a datetime in each layer that maps it.
 
     Layers without the aesthetic are returned unchanged; layers whose mapping
@@ -53,13 +52,13 @@ def cast_for_aes(
             cast_dfs.append(df)
         else:
             col_name = aes_mappings[aes]["column"]
-            cast_df = df.copy()
-            cast_df[col_name] = pd.to_datetime(cast_df[col_name])
-            cast_dfs.append(cast_df)
+            cast_dfs.append(
+                df.with_columns(pl.col(col_name).cast(pl.Datetime))
+            )
     return cast_dfs
 
 
-def cast_columns(pgs: dict, dfs: list[pd.DataFrame]) -> list[pd.DataFrame]:
+def cast_columns(pgs: dict, dfs: list[pl.DataFrame]) -> list[pl.DataFrame]:
     """Promote dates to datetimes for aesthetics that mix dates and timestamps."""
     for aes in aes_with_dt_and_ts(pgs, dfs):
         dfs = cast_for_aes(aes, pgs["layers"], dfs)

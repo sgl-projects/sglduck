@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from .cta import SglCtaAvg, SglCtaBin, SglCtaCount, SglCtaIdentity
 
@@ -55,6 +55,6 @@ def all_aesthetics(pgs: dict) -> list[str]:
     )
 
 
-def column_from_aes(layer: dict, df: pd.DataFrame, aes: str) -> pd.Series:
+def column_from_aes(layer: dict, df: pl.DataFrame, aes: str) -> pl.Series:
     """The df column the layer maps to the given aesthetic."""
     return df[layer["aes_mappings"][aes]["column"]]

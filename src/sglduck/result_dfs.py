@@ -1,37 +1,24 @@
-"""Run each layer's source SQL query into a pandas DataFrame.
+"""Run each layer's source SQL query into a polars DataFrame.
 
 Maps each pgs layer to the DataFrame produced by executing its
 ``source_sql_query`` against the supplied DuckDB connection. sglduck only
 supports DuckDB connections.
 
-Queries go through ``pandas.read_sql_query`` (DuckDB's DB-API cursor) rather
-than DuckDB's native ``con.execute(sql).df()`` on purpose: the ``.df()`` path
-converts DATE columns to ``datetime64``, collapsing the DATE/TIMESTAMP
-distinction that the date-vs-timestamp reconciliation in ``cast_columns``
-depends on. The DB-API path returns DATE columns as object-dtype
-``datetime.date`` and TIMESTAMP columns as ``datetime64``, preserving it.
+Queries go through DuckDB's native ``.pl()`` result conversion, which maps
+SQL types straight to polars dtypes: DATE columns become ``pl.Date`` and
+TIMESTAMP columns become ``pl.Datetime``, preserving the date-vs-timestamp
+distinction that the reconciliation in ``cast_columns`` depends on.
 """
 
 from __future__ import annotations
 
-import warnings
-
-import pandas as pd
+import polars as pl
 
 
-def result_dfs(pgs: dict, con) -> list[pd.DataFrame]:
+def result_dfs(pgs: dict, con) -> list[pl.DataFrame]:
     """Return one DataFrame per pgs layer, in layer order."""
     return [_query(con, layer["source_sql_query"]) for layer in pgs["layers"]]
 
 
-def _query(con, sql: str) -> pd.DataFrame:
-    with warnings.catch_warnings():
-        # pandas warns when handed a raw DB-API connection (it only tests
-        # SQLAlchemy + sqlite3), but the DuckDB DB-API path works fine —
-        # suppress the cosmetic nag so it doesn't surface on every plot.
-        warnings.filterwarnings(
-            "ignore",
-            message="pandas only supports SQLAlchemy connectable",
-            category=UserWarning,
-        )
-        return pd.read_sql_query(sql, con)
+def _query(con, sql: str) -> pl.DataFrame:
+    return con.execute(sql).pl()

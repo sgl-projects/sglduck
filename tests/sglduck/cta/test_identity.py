@@ -2,7 +2,7 @@
 
 import re
 
-import pandas as pd
+import polars as pl
 import pytest
 
 from sglduck import SglError
@@ -11,7 +11,7 @@ from sglduck.cta import SglCta, SglCtaIdentity
 
 @pytest.fixture
 def df():
-    return pd.DataFrame()
+    return pl.DataFrame()
 
 
 def test_is_an_sgl_cta_identity():

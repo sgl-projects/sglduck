@@ -1,6 +1,6 @@
 """Tests for the case-insensitive column reference matching pass."""
 
-import pandas as pd
+import polars as pl
 
 from sglduck.cta import SglCtaIdentity
 from sglduck.match_col_casing import (
@@ -19,7 +19,7 @@ from sglduck.pgs import sgl_to_pgs
 
 
 def _empty_df(*columns):
-    return pd.DataFrame({column: pd.Series([], dtype=object) for column in columns})
+    return pl.DataFrame(schema=list(columns))
 
 
 class TestColHasMatchInDf:

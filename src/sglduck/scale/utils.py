@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from ..types import is_categorical_mapping, is_temporal_mapping
 from ..utils import col_expr_has_cta, column_from_aes
 
 
-def non_numerical_in_layer(aes: str, layer: dict, df: pd.DataFrame) -> bool:
+def non_numerical_in_layer(aes: str, layer: dict, df: pl.DataFrame) -> bool:
     """Whether the layer maps the aesthetic to a non-numerical column."""
     if aes in layer["aes_mappings"]:
         if is_categorical_mapping(layer, df, aes) or is_temporal_mapping(
@@ -30,7 +30,7 @@ def raise_for_non_nums(scale, aes: str, layers: list[dict], dfs) -> None:
         )
 
 
-def non_pos_in_layer(aes: str, layer: dict, df: pd.DataFrame) -> bool:
+def non_pos_in_layer(aes: str, layer: dict, df: pl.DataFrame) -> bool:
     """Whether the layer maps the aesthetic to non-positive values."""
     aes_mappings = layer["aes_mappings"]
     if aes in aes_mappings:

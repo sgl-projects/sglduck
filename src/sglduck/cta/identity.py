@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from .base import SglCta
 
 
 class SglCtaIdentity(SglCta):
-    def valid_cta(self, col_expr: dict, df: pd.DataFrame) -> None:
+    def valid_cta(self, col_expr: dict, df: pl.DataFrame) -> None:
         if col_expr["column"] == "*":
             raise SglError(
                 "Error: '*' can only be used inside an aggregation function"

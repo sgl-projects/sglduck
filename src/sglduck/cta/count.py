@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from .base import Aggregation, SglCta
@@ -13,7 +13,7 @@ class SglCtaCount(SglCta):
     def sgl_func_name(self) -> str:
         return "count"
 
-    def valid_cta(self, col_expr: dict, df: pd.DataFrame) -> None:
+    def valid_cta(self, col_expr: dict, df: pl.DataFrame) -> None:
         count_fn_name = self.sgl_func_name()
         col_name = col_expr["column"]
         if col_name != "*":

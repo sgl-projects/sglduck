@@ -1,6 +1,7 @@
 """Tests for the date/timestamp reconciliation helpers in ``cast_columns``."""
 
-import pandas as pd
+import polars as pl
+from polars.testing import assert_frame_equal
 
 from sglduck.cast_columns import (
     aes_has_dt_and_ts,
@@ -187,7 +188,7 @@ class TestCastForAes:
 
         actual = cast_for_aes("color", pgs["layers"], dfs)[0]
 
-        pd.testing.assert_frame_equal(actual, dfs[0])
+        assert_frame_equal(actual, dfs[0])
 
     def test_layer_with_date_is_cast(self, test_con):
         pgs = sgl_to_pgs(self.THREE_LAYER_STMT)
@@ -195,9 +196,8 @@ class TestCastForAes:
 
         actual = cast_for_aes("color", pgs["layers"], dfs)[1]
 
-        expected = dfs[1].copy()
-        expected["day"] = pd.to_datetime(expected["day"])
-        pd.testing.assert_frame_equal(actual, expected)
+        expected = dfs[1].with_columns(pl.col("day").cast(pl.Datetime))
+        assert_frame_equal(actual, expected)
 
     def test_layer_with_timestamp_unchanged(self, test_con):
         pgs = sgl_to_pgs(self.THREE_LAYER_STMT)
@@ -205,7 +205,7 @@ class TestCastForAes:
 
         actual = cast_for_aes("color", pgs["layers"], dfs)[2]
 
-        pd.testing.assert_frame_equal(actual, dfs[2])
+        assert_frame_equal(actual, dfs[2])
 
 
 class TestCastColumns:
@@ -241,12 +241,10 @@ class TestCastColumns:
 
         actual = cast_columns(pgs, dfs)
 
-        expected_2 = dfs[1].copy()
-        expected_2["day"] = pd.to_datetime(expected_2["day"])
-        expected_3 = dfs[2].copy()
-        expected_3["day"] = pd.to_datetime(expected_3["day"])
+        expected_2 = dfs[1].with_columns(pl.col("day").cast(pl.Datetime))
+        expected_3 = dfs[2].with_columns(pl.col("day").cast(pl.Datetime))
 
         assert len(actual) == 3
-        pd.testing.assert_frame_equal(actual[0], dfs[0])
-        pd.testing.assert_frame_equal(actual[1], expected_2)
-        pd.testing.assert_frame_equal(actual[2], expected_3)
+        assert_frame_equal(actual[0], dfs[0])
+        assert_frame_equal(actual[1], expected_2)
+        assert_frame_equal(actual[2], expected_3)

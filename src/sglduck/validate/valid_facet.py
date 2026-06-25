@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-import pandas as pd
+import polars as pl
 
 from ..errors import SglError
 from ..types import is_categorical_col, is_numerical_col, is_temporal_col
 
 
-def in_at_least_one_data_source(col_name: str, dfs: list[pd.DataFrame]) -> bool:
+def in_at_least_one_data_source(col_name: str, dfs: list[pl.DataFrame]) -> bool:
     """Whether any layer data source has the column."""
     return any(col_name in df.columns for df in dfs)
 
 
-def col_type(col_name: str, df: pd.DataFrame) -> str | None:
+def col_type(col_name: str, df: pl.DataFrame) -> str | None:
     """The column's SGL type classification, or None if the df lacks it."""
     if col_name not in df.columns:
         return None
@@ -27,13 +27,13 @@ def col_type(col_name: str, df: pd.DataFrame) -> str | None:
     return "unknown"
 
 
-def all_types(col_name: str, dfs: list[pd.DataFrame]) -> list[str]:
+def all_types(col_name: str, dfs: list[pl.DataFrame]) -> list[str]:
     """The unique classifications of the column across the data sources."""
     types = (col_type(col_name, df) for df in dfs)
     return list(dict.fromkeys(t for t in types if t is not None))
 
 
-def valid_facet(pgs: dict, dfs: list[pd.DataFrame]) -> None:
+def valid_facet(pgs: dict, dfs: list[pl.DataFrame]) -> None:
     """Raise if the pgs facets are invalid."""
     if "facets" not in pgs:
         return

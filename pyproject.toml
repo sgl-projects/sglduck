@@ -21,7 +21,7 @@ classifiers = [
 dependencies = [
     "lets-plot",
     "duckdb",
-    "pandas",
+    "polars",
     "numpy",
 ]
 

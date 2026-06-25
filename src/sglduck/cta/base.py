@@ -15,7 +15,7 @@ from typing import NamedTuple
 
 
 class Aggregation(NamedTuple):
-    """A pandas-side aggregation spec, the analog of rsgl's quoted dplyr expr.
+    """A polars-side aggregation spec, the analog of rsgl's quoted dplyr expr.
 
     ``func`` is ``"mean"`` or ``"size"``; ``column`` is the source column to
     aggregate (``None`` for ``"size"``, which counts rows).
