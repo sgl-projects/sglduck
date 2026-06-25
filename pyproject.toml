@@ -3,14 +3,14 @@ requires = ["setuptools>=61", "pybind11>=2.12"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pysgl"
+name = "sglduck"
 version = "0.1.0"
-description = "Generate plots from a database connection and a SGL statement"
+description = "Generate plots from a DuckDB connection and a SGL statement"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Jon Chapman", email = "jochapjo@icloud.com" }]
-keywords = ["sgl", "graphics", "visualization", "sql", "plotnine", "grammar of graphics"]
+keywords = ["sgl", "graphics", "visualization", "sql", "duckdb", "lets-plot", "grammar of graphics"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
@@ -19,17 +19,18 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "plotnine",
+    "lets-plot",
+    "duckdb",
     "pandas",
     "numpy",
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-mpl", "duckdb"]
+test = ["pytest"]
 
 [project.urls]
-Homepage = "https://github.com/sgl-projects/pysgl"
-Source = "https://github.com/sgl-projects/pysgl"
+Homepage = "https://github.com/sgl-projects/sglduck"
+Source = "https://github.com/sgl-projects/sglduck"
 Paper = "https://arxiv.org/abs/2505.14690"
 
 [tool.pytest.ini_options]
@@ -41,4 +42,4 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["pysgl*"]
+include = ["sglduck*"]

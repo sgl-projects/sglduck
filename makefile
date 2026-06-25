@@ -73,7 +73,7 @@ $(TEST)/stubs.o: $(TEST)/stubs.c $(SRC)/sgl_error.h
 
 clean:
 	rm -f $(SRC)/*.o
-	rm -rf build/ src/pysgl/_sgl*.so src/_sgl/*.so
+	rm -rf build/ src/sglduck/_sgl*.so src/_sgl/*.so
 	rm -f $(TEST)/*.o
 	rm -f $(TEST)/test
 

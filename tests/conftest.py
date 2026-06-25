@@ -1,23 +1,29 @@
 """Shared pytest fixtures and data loading.
 
 Builds a DuckDB connection loaded with the ``cars`` (mtcars), ``economics``,
-``synth``, and ``diamonds`` tables used across the test suite.
+``synth``, and ``diamonds`` tables used across the test suite. The mtcars,
+economics, and diamonds datasets are vendored as CSV files under ``tests/data``.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import duckdb
 import pandas as pd
 import pytest
-from plotnine.data import diamonds, economics, mtcars
+
+_DATA_DIR = Path(__file__).parent / "data"
 
 
 def create_con_and_load_data():
     """Create a DuckDB connection and load the test tables."""
     con = duckdb.connect()
 
-    _write_table(con, "cars", mtcars)
-    _write_table(con, "economics", economics)
+    _write_table(con, "cars", pd.read_csv(_DATA_DIR / "mtcars.csv"))
+    _write_table(
+        con, "economics", pd.read_csv(_DATA_DIR / "economics.csv", parse_dates=["date"])
+    )
 
     # synth carries a DATE column (``day``) and a TIMESTAMP column
     # (``day_and_time``) sharing the same instants, for the date-vs-timestamp
@@ -47,7 +53,7 @@ def create_con_and_load_data():
     )
     con.unregister("synth_df")
 
-    _write_table(con, "diamonds", diamonds)
+    _write_table(con, "diamonds", pd.read_csv(_DATA_DIR / "diamonds.csv"))
     return con
 
 

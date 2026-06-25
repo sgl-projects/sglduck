@@ -1,7 +1,7 @@
 """Build configuration for the compiled SGL parser/bridge extension.
 
 The package metadata lives in ``pyproject.toml``; this file exists only to
-declare the ``pysgl._sgl`` C/C++ extension. We compile a fixed set of committed
+declare the ``sglduck._sgl`` C/C++ extension. We compile a fixed set of committed
 C sources (the bison/flex output is checked into version control), so there is
 no cmake and no code generation at build or install time.
 """
@@ -60,7 +60,7 @@ _extra_compile_args = [] if sys.platform == "win32" else ["-fexceptions"]
 
 ext_modules = [
     Pybind11Extension(
-        "pysgl._sgl",
+        "sglduck._sgl",
         sources=_SGL_SOURCES,
         include_dirs=["src/_sgl"],
         extra_compile_args=_extra_compile_args,
