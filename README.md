@@ -1,30 +1,31 @@
-# pysgl
+# sglduck
 
-pysgl implements the [SGL graphics
+sglduck implements the [SGL graphics
 language](https://arxiv.org/pdf/2505.14690) for use within Python. SGL is a
 graphics language that is designed to look and feel like SQL, and is
-based on the grammar of graphics.
+based on the grammar of graphics. sglduck targets [DuckDB](https://duckdb.org)
+as its database and [Lets-Plot](https://lets-plot.org) as its graphics backend.
 
 > **Status:** early development (pre-release). The API shown below is the
 > intended public interface and is not yet fully implemented.
 
 ## Installation
 
-Install the latest release from [PyPI](https://pypi.org/project/pysgl/):
+Install the latest release from [PyPI](https://pypi.org/project/sglduck/):
 
 ``` sh
-pip install pysgl
+pip install sglduck
 ```
 
 If you instead want the development version, install from GitHub with:
 
 ``` sh
-pip install git+https://github.com/sgl-projects/pysgl
+pip install git+https://github.com/sgl-projects/sglduck
 ```
 
 ## Usage
 
-`db_get_plot` is the primary interface to pysgl. It takes a database
+`db_get_plot` is the primary interface to sglduck. It takes a DuckDB
 connection and a SGL statement and returns the corresponding plot.
 
 The following example demonstrates creating a connection to an in-memory
@@ -33,7 +34,7 @@ generating a scatterplot from a SGL statement.
 
 ``` python
 import duckdb
-import pysgl
+import sglduck
 
 con = duckdb.connect()
 con.execute("create table cars as select * from 'cars.csv'")
