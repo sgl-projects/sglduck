@@ -57,3 +57,22 @@ def test_layer_carries_its_dataframe(points_plot):
     spec, dfs = points_plot
     layer_data = spec.as_dict()["layers"][0]["data"]
     assert list(layer_data.columns) == list(dfs[0].columns)
+
+
+def test_no_scales_without_a_scale_by_clause(points_plot):
+    spec, _ = points_plot
+    assert spec.as_dict()["scales"] == []
+
+
+def test_scales_from_scale_by_clause(test_con):
+    pgs = sgl_to_pgs(
+        """
+        visualize hp as x, mpg as y, cyl as color from cars using points
+        scale by log(x), linear(color)
+        """
+    )
+    dfs = result_dfs(pgs, test_con)
+    scales = rgs_to_lets_plot(pgs, dfs).as_dict()["scales"]
+    by_aes = {scale["aesthetic"]: scale for scale in scales}
+    assert by_aes["x"]["trans"] == "log10"
+    assert by_aes["color"]["trans"] == "identity"

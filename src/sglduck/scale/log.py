@@ -5,12 +5,15 @@ from __future__ import annotations
 import numpy as np
 
 from .base import SglScale
-from .utils import raise_for_non_nums, raise_for_non_pos
+from .utils import lets_plot_continuous_scales, raise_for_non_nums, raise_for_non_pos
 
 
 class SglScaleLog(SglScale):
     def sgl_func_name(self) -> str:
         return "log"
+
+    def lets_plot_scales(self, aes: str, pgs: dict) -> list:
+        return lets_plot_continuous_scales("log10", aes, pgs)
 
     def valid_scale(self, aes: str, layers: list[dict], dfs) -> None:
         super().valid_scale(aes, layers, dfs)

@@ -1,10 +1,10 @@
 """Assemble a lets-plot figure from a pgs and its per-layer DataFrames.
 
 Ported from rsgl's ``rgs_to_ggplot2.R``. This slice covers single- and
-multi-layer Cartesian plots with the default qualifier, plus axis/legend titles.
-The remaining pieces of ``rgs_to_ggplot2`` — scales, facets, polar coordinates,
-the regression/jitter/unstacked qualifiers and geom orientation — land in
-follow-up rendering PRs.
+multi-layer Cartesian plots with the default qualifier, axis/legend titles, and
+continuous scales. The remaining pieces of ``rgs_to_ggplot2`` — facets, polar
+coordinates, the regression/jitter/unstacked qualifiers and geom orientation —
+land in follow-up rendering PRs.
 """
 
 from __future__ import annotations
@@ -35,5 +35,8 @@ def rgs_to_lets_plot(pgs: dict, dfs: list):
     plot = lets_plot.ggplot()
     for layer, df in zip(pgs["layers"], dfs):
         plot += lets_plot_layer(layer, df, scales)
+    for aes, scale in scales.items():
+        for scale_feature in scale.lets_plot_scales(aes, pgs):
+            plot += scale_feature
     plot += lets_plot_labs(pgs)
     return plot
