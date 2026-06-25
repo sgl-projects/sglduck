@@ -3,12 +3,19 @@
 As with CTAs, a geom's behaviour lives in methods on the class hierarchy. Geoms
 are stateless value objects with class-based equality and hashing.
 
-Methods that require a layer, DataFrame or scales (``lets_plot_aes``,
-``group_aes_cols``) belong to the rendering milestone and are not defined here
-yet.
+``lets_plot_aes`` builds a layer's positional/non-positional aesthetic mapping.
+Collective grouping (the ``collect by`` clause, ``group_aes_cols``) belongs to a
+later rendering PR and is not defined here yet.
 """
 
 from __future__ import annotations
+
+import lets_plot
+
+from .utils import mapping_col_name
+
+# theta/r fold onto the Cartesian x/y axes (polar coordinates are applied later).
+_POLAR_TO_CART = {"theta": "x", "r": "y"}
 
 
 class SglGeom:
@@ -17,6 +24,21 @@ class SglGeom:
 
     def is_collective(self) -> bool:
         return False
+
+    def lets_plot_aes(self, layer: dict, df, scales: dict):
+        """Build the lets-plot ``aes`` mapping for this layer.
+
+        Mirrors rsgl's ``ggplot_aes.sgl_geom``: each mapped aesthetic points at
+        its (possibly CTA-derived) column, ``theta``/``r`` fold onto ``x``/``y``,
+        and any unmapped ``x``/``y`` is blanked.
+        """
+        aes_args: dict[str, str] = {}
+        for aes, col_expr in layer["aes_mappings"].items():
+            key = _POLAR_TO_CART.get(aes, aes)
+            aes_args[key] = mapping_col_name(aes, col_expr, scales)
+        aes_args.setdefault("x", "")
+        aes_args.setdefault("y", "")
+        return lets_plot.aes(**aes_args)
 
     def __eq__(self, other: object) -> bool:
         return type(self) is type(other)
