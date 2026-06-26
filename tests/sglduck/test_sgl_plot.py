@@ -60,3 +60,15 @@ def test_qualifier_statements_render_svg(test_con, stmt):
 )
 def test_faceted_statements_render_svg(test_con, stmt):
     assert "<svg" in db_get_plot(test_con, stmt).to_svg()
+
+
+@pytest.mark.parametrize(
+    "stmt",
+    [
+        "visualize hp as theta, mpg as r from cars using points",
+        "visualize letter as theta, number as r, boolean as color "
+        "from synth using bars",
+    ],
+)
+def test_polar_statements_render_svg(test_con, stmt):
+    assert "<svg" in db_get_plot(test_con, stmt).to_svg()
