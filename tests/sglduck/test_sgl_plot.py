@@ -72,3 +72,17 @@ def test_faceted_statements_render_svg(test_con, stmt):
 )
 def test_polar_statements_render_svg(test_con, stmt):
     assert "<svg" in db_get_plot(test_con, stmt).to_svg()
+
+
+# Single-positional-aesthetic plots: the unmapped axis is pinned to a constant
+# blank column (a pie chart from a theta-only mapping, a single boxplot).
+@pytest.mark.parametrize(
+    "stmt",
+    [
+        "visualize count(*) as theta, cut as color from diamonds "
+        "group by cut using bars",
+        "visualize mpg as x from cars using boxes",
+    ],
+)
+def test_single_positional_aesthetic_statements_render_svg(test_con, stmt):
+    assert "<svg" in db_get_plot(test_con, stmt).to_svg()

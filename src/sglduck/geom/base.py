@@ -12,10 +12,8 @@ from __future__ import annotations
 
 import lets_plot
 
+from ..constants import BLANK_AES_COLUMN, POLAR_TO_CART_AES
 from .utils import mapping_col_name
-
-# theta/r fold onto the Cartesian x/y axes (polar coordinates are applied later).
-_POLAR_TO_CART = {"theta": "x", "r": "y"}
 
 
 class SglGeom:
@@ -30,14 +28,15 @@ class SglGeom:
 
         Mirrors rsgl's ``ggplot_aes.sgl_geom``: each mapped aesthetic points at
         its (possibly CTA-derived) column, ``theta``/``r`` fold onto ``x``/``y``,
-        and any unmapped ``x``/``y`` is blanked.
+        and any unmapped ``x``/``y`` is pinned to the constant blank column that
+        ``lets_plot_layer`` adds to the data.
         """
         aes_args: dict[str, str] = {}
         for aes, col_expr in layer["aes_mappings"].items():
-            key = _POLAR_TO_CART.get(aes, aes)
+            key = POLAR_TO_CART_AES.get(aes, aes)
             aes_args[key] = mapping_col_name(aes, col_expr, scales)
-        aes_args.setdefault("x", "")
-        aes_args.setdefault("y", "")
+        aes_args.setdefault("x", BLANK_AES_COLUMN)
+        aes_args.setdefault("y", BLANK_AES_COLUMN)
         return lets_plot.aes(**aes_args)
 
     def __eq__(self, other: object) -> bool:
