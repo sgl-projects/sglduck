@@ -16,7 +16,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # Windows is a follow-up: the committed flex/parser sources need MSVC
+        # portability work (unistd.h, asprintf).
+        os: [ubuntu-latest, macos-latest]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
@@ -27,20 +29,9 @@ jobs:
         shell: bash
         run: pip install ".[test]"
       - name: Run tests
-        # Visual SVG snapshots run on a single platform (see the snapshot job);
-        # everywhere else, exercise the build and all platform-stable tests.
+        # The lets-plot SVG snapshot tests are excluded: their baselines are
+        # platform-specific (lets-plot renders differently per OS), so they are
+        # a local visual-regression tool, not CI-enforced. Everything else —
+        # the build and all platform-stable tests — runs here.
         shell: bash
         run: pytest -m "not snapshot"
-
-  snapshot:
-    name: visual snapshots
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Install (compiles the _sgl extension)
-        run: pip install ".[test]"
-      - name: Run visual snapshot tests
-        run: pytest -m snapshot

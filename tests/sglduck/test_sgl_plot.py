@@ -4,6 +4,11 @@ Each statement renders through the full cast_columns -> perform_ctas ->
 rgs_to_lets_plot pipeline to SVG, compared against a committed baseline under
 ``tests/baseline/`` (see the ``svg_snapshot`` fixture in conftest). Regenerate
 the baselines with ``pytest --snapshot-update`` and review the diff.
+
+These carry the ``snapshot`` marker and are a local visual-regression tool: the
+baselines are platform-specific (lets-plot renders the same plot slightly
+differently per OS), so CI excludes them (``pytest -m "not snapshot"``) and runs
+the platform-stable suite instead. Regenerate on the platform you compare on.
 """
 
 import pytest
