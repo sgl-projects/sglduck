@@ -103,9 +103,9 @@ def test_continuous_scales_color_for_non_bar():
         visualize hp as x, mpg as y from cars using bars
         """
     )
-    assert _as_dicts(lets_plot_continuous_scales("identity", "color", pgs)) == _as_dicts(
-        [lets_plot.scale_color_continuous(trans="identity")]
-    )
+    assert _as_dicts(
+        lets_plot_continuous_scales("identity", "color", pgs)
+    ) == _as_dicts([lets_plot.scale_color_continuous(trans="identity")])
 
 
 def test_continuous_scales_fill_for_bar():
@@ -116,9 +116,9 @@ def test_continuous_scales_fill_for_bar():
         visualize hp as x, mpg as y, cyl as color from cars using bars
         """
     )
-    assert _as_dicts(lets_plot_continuous_scales("identity", "color", pgs)) == _as_dicts(
-        [lets_plot.scale_fill_continuous(trans="identity")]
-    )
+    assert _as_dicts(
+        lets_plot_continuous_scales("identity", "color", pgs)
+    ) == _as_dicts([lets_plot.scale_fill_continuous(trans="identity")])
 
 
 def test_continuous_scales_color_and_fill_for_both():
@@ -145,6 +145,6 @@ def test_continuous_scales_color_has_no_duplicates():
         visualize hp as x, mpg as y, cyl as color from cars using line
         """
     )
-    assert _as_dicts(lets_plot_continuous_scales("identity", "color", pgs)) == _as_dicts(
-        [lets_plot.scale_color_continuous(trans="identity")]
-    )
+    assert _as_dicts(
+        lets_plot_continuous_scales("identity", "color", pgs)
+    ) == _as_dicts([lets_plot.scale_color_continuous(trans="identity")])

@@ -1,7 +1,7 @@
 """Tests for ``result_dfs``."""
 
-from polars.testing import assert_frame_equal
 import pytest
+from polars.testing import assert_frame_equal
 
 from sglduck.pgs import sgl_to_pgs
 from sglduck.result_dfs import result_dfs

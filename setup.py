@@ -27,7 +27,9 @@ class BuildExt(build_ext):
 
         def patched_compile(obj, src, ext, cc_args, extra_postargs, pp_opts):
             if src.endswith(".c"):
-                extra_postargs = [a for a in extra_postargs if not a.startswith("-std=")]
+                extra_postargs = [
+                    a for a in extra_postargs if not a.startswith("-std=")
+                ]
             return original_compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
 
         self.compiler._compile = patched_compile
