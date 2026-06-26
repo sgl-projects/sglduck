@@ -4,6 +4,12 @@ Each statement renders through the full cast_columns -> perform_ctas ->
 rgs_to_lets_plot pipeline to SVG, compared against a committed baseline under
 ``tests/baseline/`` (see the ``svg_snapshot`` fixture in conftest). Regenerate
 the baselines with ``pytest --snapshot-update`` and review the diff.
+
+These carry the ``snapshot`` marker. The baselines are platform-specific
+(lets-plot renders the same plot slightly differently per OS) and are generated
+on macOS, so CI runs them in a dedicated macOS job while the cross-platform
+matrix runs the platform-stable suite (``pytest -m "not snapshot"``). Regenerate
+on macOS so the baselines match.
 """
 
 import pytest
@@ -136,6 +142,7 @@ _PLOTS = [
     ),
 ]
 
+@pytest.mark.snapshot
 @pytest.mark.parametrize("name,stmt", [pytest.param(n, s, id=n) for n, s in _PLOTS])
 def test_plot_matches_snapshot(test_con, svg_snapshot, name, stmt):
     svg_snapshot.assert_match(name, db_get_plot(test_con, stmt).to_svg())

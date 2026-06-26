@@ -37,6 +37,9 @@ Paper = "https://arxiv.org/abs/2505.14690"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--import-mode=importlib"]
+markers = [
+    "snapshot: lets-plot SVG snapshot regression tests (rendering, may be platform-sensitive)",
+]
 
 [tool.setuptools]
 package-dir = { "" = "src" }

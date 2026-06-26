@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows is a follow-up: the committed flex/parser sources need MSVC
+        # portability work (unistd.h, asprintf).
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install (compiles the _sgl extension)
+        shell: bash
+        run: pip install ".[test]"
+      - name: Run tests
+        # The lets-plot SVG snapshot tests run in the dedicated `snapshot` job
+        # (their baselines are platform-specific); the matrix runs everything
+        # else — the build and all platform-stable tests.
+        shell: bash
+        run: pytest -m "not snapshot"
+
+  snapshot:
+    name: visual snapshots (macos)
+    # The baselines are platform-specific; they are generated on macOS, so the
+    # snapshot job runs on macOS too. lets-plot is pinned to the baseline version
+    # since its SVG output changes between releases.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install (compiles the _sgl extension)
+        run: pip install ".[test]" "lets-plot==4.10.1"
+      - name: Run visual snapshot tests
+        run: pytest -m snapshot
