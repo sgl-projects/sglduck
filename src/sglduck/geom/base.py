@@ -23,13 +23,13 @@ class SglGeom:
     def is_collective(self) -> bool:
         return False
 
-    def lets_plot_aes(self, layer: dict, df, scales: dict):
-        """Build the lets-plot ``aes`` mapping for this layer.
+    def lets_plot_aes_args(self, layer: dict, df, scales: dict) -> dict[str, str]:
+        """The ``{aesthetic: column}`` args for this layer's lets-plot mapping.
 
-        Mirrors rsgl's ``ggplot_aes.sgl_geom``: each mapped aesthetic points at
-        its (possibly CTA-derived) column, ``theta``/``r`` fold onto ``x``/``y``,
-        and any unmapped ``x``/``y`` is pinned to the constant blank column that
-        ``lets_plot_layer`` adds to the data.
+        Each mapped aesthetic points at its (possibly CTA-derived) column,
+        ``theta``/``r`` fold onto ``x``/``y``, and any unmapped ``x``/``y`` is
+        pinned to the constant blank column that ``lets_plot_layer`` adds to the
+        data. Subclasses adjust the result (e.g. bars remap ``color`` to fill).
         """
         aes_args: dict[str, str] = {}
         for aes, col_expr in layer["aes_mappings"].items():
@@ -37,7 +37,14 @@ class SglGeom:
             aes_args[key] = mapping_col_name(aes, col_expr, scales)
         aes_args.setdefault("x", BLANK_AES_COLUMN)
         aes_args.setdefault("y", BLANK_AES_COLUMN)
-        return lets_plot.aes(**aes_args)
+        return aes_args
+
+    def lets_plot_aes(self, layer: dict, df, scales: dict):
+        """Build the lets-plot ``aes`` mapping for this layer.
+
+        Mirrors rsgl's ``ggplot_aes.sgl_geom``.
+        """
+        return lets_plot.aes(**self.lets_plot_aes_args(layer, df, scales))
 
     def __eq__(self, other: object) -> bool:
         return type(self) is type(other)

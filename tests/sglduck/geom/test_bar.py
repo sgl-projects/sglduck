@@ -1,7 +1,7 @@
 """Tests for SglGeomBar (pure methods only).
 
-``lets_plot_aes`` (including the colour -> fill remap) is deferred to the
-rendering milestone.
+The ``lets_plot_aes`` colour -> fill remap is covered by the rendering tests
+(``test_rgs_to_lets_plot``), which exercise it against a layer and DataFrame.
 """
 
 import lets_plot

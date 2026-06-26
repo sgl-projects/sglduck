@@ -181,6 +181,26 @@ def test_two_facets_fill_columns_and_rows(test_con, facet_clause, expected_x, ex
     assert facet["y"] == expected_y
 
 
+def test_bar_color_aesthetic_maps_to_fill(test_con):
+    # bars colour their interior, so color maps onto fill, not the stroke
+    layer = _first_layer_dict(
+        test_con,
+        "visualize letter as x, number as y, boolean as color "
+        "from synth using bars",
+    )
+    assert layer["mapping"].get("fill") == "boolean"
+    assert "color" not in layer["mapping"]
+
+
+def test_non_bar_color_aesthetic_maps_to_color(test_con):
+    layer = _first_layer_dict(
+        test_con,
+        "visualize hp as x, mpg as y, cyl as color from cars using points",
+    )
+    assert layer["mapping"].get("color") == "cyl"
+    assert "fill" not in layer["mapping"]
+
+
 POLAR_STMT = "visualize hp as theta, mpg as r from cars using points"
 
 

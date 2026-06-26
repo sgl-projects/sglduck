@@ -192,17 +192,17 @@ font-size: 13.0px;
         <g transform="translate(9.980605455468202 0.0 ) ">
           <g>
             <g buffered-rendering="static">
-              <rect x="327.9433478690564" y="16.85714285714289" height="337.1428571428571" width="134.1586423100685" stroke="rgb(55,126,184)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+              <rect x="327.9433478690564" y="16.85714285714289" height="337.1428571428571" width="134.1586423100685" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(55,126,184)" fill-opacity="1.0" stroke-width="1.6500000000000001">
               </rect>
-              <rect x="178.87818974675804" y="73.04761904761904" height="280.95238095238096" width="134.1586423100685" stroke="rgb(55,126,184)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+              <rect x="178.87818974675804" y="73.04761904761904" height="280.95238095238096" width="134.1586423100685" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(55,126,184)" fill-opacity="1.0" stroke-width="1.6500000000000001">
               </rect>
-              <rect x="29.81303162445967" y="129.23809523809524" height="224.76190476190476" width="134.15864231006856" stroke="rgb(55,126,184)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+              <rect x="29.81303162445967" y="129.23809523809524" height="224.76190476190476" width="134.15864231006856" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(55,126,184)" fill-opacity="1.0" stroke-width="1.6500000000000001">
               </rect>
-              <rect x="327.9433478690564" y="185.42857142857144" height="168.57142857142856" width="134.1586423100685" stroke="rgb(228,26,28)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+              <rect x="327.9433478690564" y="185.42857142857144" height="168.57142857142856" width="134.1586423100685" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(228,26,28)" fill-opacity="1.0" stroke-width="1.6500000000000001">
               </rect>
-              <rect x="178.87818974675804" y="241.61904761904762" height="112.38095238095238" width="134.1586423100685" stroke="rgb(228,26,28)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+              <rect x="178.87818974675804" y="241.61904761904762" height="112.38095238095238" width="134.1586423100685" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(228,26,28)" fill-opacity="1.0" stroke-width="1.6500000000000001">
               </rect>
-              <rect x="29.81303162445967" y="297.8095238095238" height="56.190476190476204" width="134.15864231006856" stroke="rgb(228,26,28)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+              <rect x="29.81303162445967" y="297.8095238095238" height="56.190476190476204" width="134.15864231006856" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(228,26,28)" fill-opacity="1.0" stroke-width="1.6500000000000001">
               </rect>
             </g>
           </g>
@@ -323,7 +323,7 @@ font-size: 13.0px;
             <g>
               <g transform="translate(1.0 1.0 ) ">
                 <g>
-                  <rect x="0.8250000000000001" y="0.8250000000000001" height="19.35" width="19.35" stroke="rgb(228,26,28)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+                  <rect x="0.8250000000000001" y="0.8250000000000001" height="19.35" width="19.35" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(228,26,28)" fill-opacity="1.0" stroke-width="1.6500000000000001">
                   </rect>
                 </g>
               </g>
@@ -338,7 +338,7 @@ font-size: 13.0px;
             <g>
               <g transform="translate(1.0 1.0 ) ">
                 <g>
-                  <rect x="0.8250000000000001" y="0.8250000000000001" height="19.35" width="19.35" stroke="rgb(55,126,184)" stroke-opacity="1.0" fill="rgb(17,142,216)" fill-opacity="1.0" stroke-width="1.6500000000000001">
+                  <rect x="0.8250000000000001" y="0.8250000000000001" height="19.35" width="19.35" stroke="rgb(255,255,255)" stroke-opacity="1.0" fill="rgb(55,126,184)" fill-opacity="1.0" stroke-width="1.6500000000000001">
                   </rect>
                 </g>
               </g>

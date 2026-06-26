@@ -23,5 +23,13 @@ class SglGeomBar(SglGeom):
     def lets_plot_dir_from_qual(self, qual: str) -> str:
         return "x" if qual == "vertical" else "y"
 
+    def lets_plot_aes_args(self, layer: dict, df, scales: dict) -> dict[str, str]:
+        # A bar colours its interior, so the color aesthetic maps onto fill
+        # rather than the default stroke. Mirrors rsgl's ggplot_aes.sgl_geom_bar.
+        aes_args = super().lets_plot_aes_args(layer, df, scales)
+        if "color" in aes_args:
+            aes_args["fill"] = aes_args.pop("color")
+        return aes_args
+
     def lets_plot_geom(self):
         return lets_plot.geom_bar
