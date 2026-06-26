@@ -29,6 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest"]
 lint = ["ruff==0.15.20"]
+docs = ["mkdocs-material", "mkdocstrings[python]", "markdown-exec"]
 
 [project.urls]
 Homepage = "https://github.com/sgl-projects/sglduck"
