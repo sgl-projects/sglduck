@@ -136,27 +136,7 @@ _PLOTS = [
     ),
 ]
 
-# These render but rely on collective grouping (group_aes_cols), which is not
-# yet implemented, so the output is incomplete (a single line/regression spanning
-# all groups rather than one per group). Snapshot them once that lands.
-_NEEDS_COLLECTIVE_GROUPING = {
-    "line_chart_default_collection_on_color",
-    "line_plot_with_multiple_collective_lines",
-    "linear_regression_line_plot",
-}
-
-
-def _plot_params():
-    for name, stmt in _PLOTS:
-        marks = (
-            [pytest.mark.skip(reason="needs collective grouping (group_aes_cols)")]
-            if name in _NEEDS_COLLECTIVE_GROUPING
-            else []
-        )
-        yield pytest.param(name, stmt, id=name, marks=marks)
-
-
-@pytest.mark.parametrize("name,stmt", list(_plot_params()))
+@pytest.mark.parametrize("name,stmt", [pytest.param(n, s, id=n) for n, s in _PLOTS])
 def test_plot_matches_snapshot(test_con, svg_snapshot, name, stmt):
     svg_snapshot.assert_match(name, db_get_plot(test_con, stmt).to_svg())
 

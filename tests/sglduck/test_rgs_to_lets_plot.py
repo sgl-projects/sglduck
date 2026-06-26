@@ -201,6 +201,46 @@ def test_non_bar_color_aesthetic_maps_to_color(test_con):
     assert "fill" not in layer["mapping"]
 
 
+def test_line_collects_by_its_color(test_con):
+    layer = _first_layer_dict(
+        test_con, "visualize hp as x, mpg as y, cyl as color from cars using lines"
+    )
+    assert layer["mapping"]["group"] == ["cyl"]
+
+
+def test_collect_by_clause_sets_the_group(test_con):
+    layer = _first_layer_dict(
+        test_con,
+        "visualize letter as x, number as y from synth "
+        "collect by boolean using lines",
+    )
+    assert layer["mapping"]["group"] == ["boolean"]
+
+
+def test_box_collects_by_its_category(test_con):
+    layer = _first_layer_dict(
+        test_con, "visualize cut as x, price as y from diamonds using boxes"
+    )
+    assert layer["mapping"]["group"] == ["cut"]
+
+
+def test_plain_line_has_no_group(test_con):
+    layer = _first_layer_dict(
+        test_con, "visualize date as x, pop as y from economics using line"
+    )
+    assert "group" not in layer["mapping"]
+
+
+def test_multi_column_collection_groups_by_all_columns(test_con):
+    # lets-plot's group aesthetic takes a list and groups by the combination
+    layer = _first_layer_dict(
+        test_con,
+        "visualize letter as x, number as y from synth "
+        "collect by boolean, day using lines",
+    )
+    assert set(layer["mapping"]["group"]) == {"boolean", "day"}
+
+
 POLAR_STMT = "visualize hp as theta, mpg as r from cars using points"
 
 
