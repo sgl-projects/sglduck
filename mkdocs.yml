@@ -1,0 +1,52 @@
+site_name: sglduck
+site_description: Generate plots from a DuckDB connection and a SGL statement
+# The site URL and repo links live here only — a repo/project rename is a
+# one-place change.
+site_url: https://sgl-projects.github.io/sglduck/
+repo_url: https://github.com/sgl-projects/sglduck
+repo_name: sgl-projects/sglduck
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Get started: get-started.md
+  - Example gallery: gallery.md
+  - Reference: reference.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            show_root_heading: true
+            show_source: false
+            heading_level: 2
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences:
+      custom_fences:
+        - name: python
+          class: python
+          validator: !!python/name:markdown_exec.validator
+          format: !!python/name:markdown_exec.formatter

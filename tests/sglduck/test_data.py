@@ -31,6 +31,17 @@ def test_each_call_returns_an_independent_frame():
     assert data.cars() is not data.cars()
 
 
+def test_numeric_columns_are_numeric():
+    # the "NA" missing-value markers must not make numeric columns strings, or
+    # bin()/log() reject them (this broke the docs build).
+    cars = data.cars()
+    for col in ["car_id", "horsepower", "miles_per_gallon", "year"]:
+        assert cars[col].dtype.is_numeric(), f"cars.{col} is {cars[col].dtype}"
+    trees = data.trees()
+    for col in ["age", "circumference"]:
+        assert trees[col].dtype.is_numeric(), f"trees.{col} is {trees[col].dtype}"
+
+
 def test_cars_renders_through_db_get_plot():
     con = duckdb.connect()
     con.register("cars", data.cars())

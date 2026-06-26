@@ -16,7 +16,12 @@ from .validate import validate_semantics
 
 
 def db_get_plot(con, sgl_stmt: str) -> SglPlot:
-    """Return the ``SglPlot`` defined by ``sgl_stmt`` against DuckDB ``con``."""
+    """Return the ``SglPlot`` defined by a SGL statement.
+
+    :param con: A DuckDB connection holding the tables the statement queries.
+    :param sgl_stmt: A SGL statement (see the Get started guide for the language).
+    :return: An ``SglPlot`` that renders the corresponding plot.
+    """
     pgs = sgl_to_pgs(sgl_stmt)
     dfs = result_dfs(pgs, con)
     pgs = match_col_casing(pgs, dfs)
