@@ -136,6 +136,7 @@ _PLOTS = [
     ),
 ]
 
+@pytest.mark.snapshot
 @pytest.mark.parametrize("name,stmt", [pytest.param(n, s, id=n) for n, s in _PLOTS])
 def test_plot_matches_snapshot(test_con, svg_snapshot, name, stmt):
     svg_snapshot.assert_match(name, db_get_plot(test_con, stmt).to_svg())

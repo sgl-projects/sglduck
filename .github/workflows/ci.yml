@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install (compiles the _sgl extension)
+        shell: bash
+        run: pip install ".[test]"
+      - name: Run tests
+        # Visual SVG snapshots run on a single platform (see the snapshot job);
+        # everywhere else, exercise the build and all platform-stable tests.
+        shell: bash
+        run: pytest -m "not snapshot"
+
+  snapshot:
+    name: visual snapshots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install (compiles the _sgl extension)
+        run: pip install ".[test]"
+      - name: Run visual snapshot tests
+        run: pytest -m snapshot
