@@ -142,7 +142,8 @@ _FACET_BASE = "visualize letter as x, number as y from synth using points facet 
 
 
 def test_no_facet_without_facet_by_clause(test_con):
-    assert _facet(test_con, "visualize letter as x, number as y from synth using points") is None
+    stmt = "visualize letter as x, number as y from synth using points"
+    assert _facet(test_con, stmt) is None
 
 
 def test_single_default_facet_is_a_column(test_con):
@@ -175,7 +176,9 @@ def test_single_vertical_facet_is_a_row(test_con):
         ("letter vertically, boolean horizontally", "boolean", "letter"),
     ],
 )
-def test_two_facets_fill_columns_and_rows(test_con, facet_clause, expected_x, expected_y):
+def test_two_facets_fill_columns_and_rows(
+    test_con, facet_clause, expected_x, expected_y
+):
     facet = _facet(test_con, _FACET_BASE + facet_clause)
     assert facet["x"] == expected_x
     assert facet["y"] == expected_y

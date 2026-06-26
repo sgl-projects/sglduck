@@ -118,7 +118,9 @@ def test_labs_args_explicit_color_title(geom, _other, expected_key, unexpected_k
 
 @pytest.mark.parametrize("geom,_other,expected_key,unexpected_key", COLOR_CASES)
 @pytest.mark.parametrize("expr", DEFAULT_TITLE_EXPRS)
-def test_labs_args_default_color_title(geom, _other, expected_key, unexpected_key, expr):
+def test_labs_args_default_color_title(
+    geom, _other, expected_key, unexpected_key, expr
+):
     pgs = sgl_to_pgs(f"visualize {expr} as color from cars using {geom}")
     args = labs_args(pgs)
     assert args[expected_key] == expr
@@ -126,7 +128,9 @@ def test_labs_args_default_color_title(geom, _other, expected_key, unexpected_ke
 
 
 @pytest.mark.parametrize("geom,_other,expected_key,unexpected_key", COLOR_CASES)
-def test_labs_args_skips_layer_without_color_aes(geom, _other, expected_key, unexpected_key):
+def test_labs_args_skips_layer_without_color_aes(
+    geom, _other, expected_key, unexpected_key
+):
     pgs = sgl_to_pgs(
         f"""
         visualize hp as x, mpg as y from cars using {geom}

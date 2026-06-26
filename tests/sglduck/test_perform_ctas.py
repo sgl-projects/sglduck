@@ -3,8 +3,8 @@
 from polars.testing import assert_frame_equal
 
 from sglduck.perform_as_for_layer import perform_as_for_layer
-from sglduck.perform_cts_for_layer import perform_cts_for_layer
 from sglduck.perform_ctas import perform_ctas
+from sglduck.perform_cts_for_layer import perform_cts_for_layer
 from sglduck.pgs import sgl_to_pgs
 from sglduck.result_dfs import result_dfs
 

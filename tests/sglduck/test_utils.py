@@ -1,7 +1,7 @@
 """Tests for the pgs helper functions in ``utils``."""
 
-from polars.testing import assert_series_equal
 import pytest
+from polars.testing import assert_series_equal
 
 from sglduck.cta import SglCtaAvg, SglCtaBin, SglCtaCount, SglCtaIdentity
 from sglduck.pgs import sgl_to_pgs
@@ -19,20 +19,20 @@ from sglduck.utils import (
     ("col_expr_cta", "cta_name", "expected_result"),
     [
         pytest.param(SglCtaIdentity(), "identity", True, id="id expr has id"),
-        pytest.param(SglCtaBin(), "identity", False, id="bin expr does not have id"),
+        pytest.param(SglCtaBin(), "identity", False, id="bin expr lacks id"),
         pytest.param(SglCtaCount(), "identity", False, id="count expr does not id"),
-        pytest.param(SglCtaAvg(), "identity", False, id="avg expr does not have id"),
-        pytest.param(SglCtaIdentity(), "bin", False, id="id expr does not have bin"),
+        pytest.param(SglCtaAvg(), "identity", False, id="avg expr lacks id"),
+        pytest.param(SglCtaIdentity(), "bin", False, id="id expr lacks bin"),
         pytest.param(SglCtaBin(), "bin", True, id="bin expr has bin"),
-        pytest.param(SglCtaCount(), "bin", False, id="count expr does not have bin"),
-        pytest.param(SglCtaAvg(), "bin", False, id="avg expr does not have bin"),
-        pytest.param(SglCtaIdentity(), "count", False, id="id expr does not have count"),
-        pytest.param(SglCtaBin(), "count", False, id="bin expr does not have count"),
+        pytest.param(SglCtaCount(), "bin", False, id="count expr lacks bin"),
+        pytest.param(SglCtaAvg(), "bin", False, id="avg expr lacks bin"),
+        pytest.param(SglCtaIdentity(), "count", False, id="id expr lacks count"),
+        pytest.param(SglCtaBin(), "count", False, id="bin expr lacks count"),
         pytest.param(SglCtaCount(), "count", True, id="count expr has count"),
-        pytest.param(SglCtaAvg(), "count", False, id="avg expr does not have count"),
-        pytest.param(SglCtaIdentity(), "avg", False, id="id expr does not have avg"),
-        pytest.param(SglCtaBin(), "avg", False, id="bin expr does not have avg"),
-        pytest.param(SglCtaCount(), "avg", False, id="count expr does not have avg"),
+        pytest.param(SglCtaAvg(), "count", False, id="avg expr lacks count"),
+        pytest.param(SglCtaIdentity(), "avg", False, id="id expr lacks avg"),
+        pytest.param(SglCtaBin(), "avg", False, id="bin expr lacks avg"),
+        pytest.param(SglCtaCount(), "avg", False, id="count expr lacks avg"),
         pytest.param(SglCtaAvg(), "avg", True, id="avg expr has avg"),
     ],
 )
