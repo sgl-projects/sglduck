@@ -294,6 +294,32 @@ def test_is_binned_mapping_determines_whether_mapping_is_binned():
     assert is_binned_mapping(layer, "color") is False
 
 
+def test_mapping_checks_tolerate_a_dropped_source_column():
+    # A binned mapping's source column is consumed by perform_ctas, so the
+    # post-CTA frame no longer has it. The orientation type checks run against
+    # that frame and must read the missing column as "no type" rather than
+    # raising (rsgl relies on R returning NULL for the absent column).
+    pgs = sgl_to_pgs("""
+        visualize
+            bin(float_col) as x,
+            count(*) as y
+        from all_classes
+        group by
+            bin(float_col)
+        using bars
+    """)
+    layer = pgs["layers"][0]
+    post_cta_df = pl.DataFrame(
+        {"sglduck.linear.bin.30.float_col": [1.0], "sglduck.count": [5]}
+    )
+
+    assert is_numerical_mapping(layer, post_cta_df, "x") is False
+    assert is_categorical_mapping(layer, post_cta_df, "x") is False
+    assert is_date_mapping(layer, post_cta_df, "x") is False
+    assert is_timestamp_mapping(layer, post_cta_df, "x") is False
+    assert is_temporal_mapping(layer, post_cta_df, "x") is False
+
+
 def test_type_classifications_raises_error_if_table_doesnt_exist(test_con):
     with pytest.raises(
         Exception, match="Table with name not_a_table does not exist"

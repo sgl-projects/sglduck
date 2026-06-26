@@ -12,7 +12,7 @@ from __future__ import annotations
 import polars as pl
 
 from .result_dfs import _query
-from .utils import col_expr_has_cta, column_from_aes
+from .utils import col_expr_has_cta
 
 
 def is_numerical_col(col: pl.Series) -> bool:
@@ -40,12 +40,26 @@ def is_temporal_col(col: pl.Series) -> bool:
     return is_date_col(col) or is_timestamp_col(col)
 
 
+def _mapped_column(layer: dict, df: pl.DataFrame, aes: str) -> pl.Series | None:
+    """The df column the aesthetic maps to, or ``None`` when it isn't in the frame.
+
+    A binned or aggregated mapping's source column does not survive
+    ``perform_ctas`` (it is consumed by the bin/aggregation), so an orientation
+    type check can run against a frame that no longer has it. rsgl relies on R
+    returning ``NULL`` for a missing column — the type checks then read as
+    ``FALSE`` — whereas polars raises, so the absence is made explicit here.
+    """
+    column = layer["aes_mappings"][aes]["column"]
+    return df[column] if column in df.columns else None
+
+
 def is_numerical_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
     """Whether the layer's mapping to the aesthetic is numerical."""
     aes_mapping = layer["aes_mappings"][aes]
     if col_expr_has_cta(aes_mapping, "count"):
         return True
-    return is_numerical_col(column_from_aes(layer, df, aes))
+    col = _mapped_column(layer, df, aes)
+    return col is not None and is_numerical_col(col)
 
 
 def is_categorical_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
@@ -53,7 +67,8 @@ def is_categorical_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
     aes_mapping = layer["aes_mappings"][aes]
     if col_expr_has_cta(aes_mapping, "count"):
         return False
-    return is_categorical_col(column_from_aes(layer, df, aes))
+    col = _mapped_column(layer, df, aes)
+    return col is not None and is_categorical_col(col)
 
 
 def is_date_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
@@ -61,7 +76,8 @@ def is_date_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
     aes_mapping = layer["aes_mappings"][aes]
     if col_expr_has_cta(aes_mapping, "count"):
         return False
-    return is_date_col(column_from_aes(layer, df, aes))
+    col = _mapped_column(layer, df, aes)
+    return col is not None and is_date_col(col)
 
 
 def is_timestamp_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
@@ -69,7 +85,8 @@ def is_timestamp_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:
     aes_mapping = layer["aes_mappings"][aes]
     if col_expr_has_cta(aes_mapping, "count"):
         return False
-    return is_timestamp_col(column_from_aes(layer, df, aes))
+    col = _mapped_column(layer, df, aes)
+    return col is not None and is_timestamp_col(col)
 
 
 def is_temporal_mapping(layer: dict, df: pl.DataFrame, aes: str) -> bool:

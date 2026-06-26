@@ -86,3 +86,22 @@ def test_polar_statements_render_svg(test_con, stmt):
 )
 def test_single_positional_aesthetic_statements_render_svg(test_con, stmt):
     assert "<svg" in db_get_plot(test_con, stmt).to_svg()
+
+
+# Direction-aware geoms (bars) with binned/aggregated mappings: computing geom
+# orientation must not crash on a source column that perform_ctas consumed
+# (e.g. bin(mpg), avg(hp) — the column is gone from the post-CTA frame).
+@pytest.mark.parametrize(
+    "stmt",
+    [
+        "visualize bin(mpg) as x, count(*) as y from cars "
+        "group by bin(mpg) using bars",
+        "visualize bin(mpg) as y, count(*) as x from cars "
+        "group by bin(mpg) using bars",
+        "visualize bin(mpg, 10) as x, count(*) as y from cars "
+        "group by bin(mpg, 10) using bars",
+        "visualize cyl as x, avg(hp) as y from cars group by cyl using bars",
+    ],
+)
+def test_binned_and_aggregated_bar_charts_render_svg(test_con, stmt):
+    assert "<svg" in db_get_plot(test_con, stmt).to_svg()
