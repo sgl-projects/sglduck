@@ -1,0 +1,63 @@
+name: Release
+
+# Builds the sdist and per-platform wheels, then publishes to TestPyPI.
+# Triggers:
+#   - pushing a version tag (vX.Y.Z) -> build + publish
+#   - manual run -> build (and publish only if the "publish" box is checked)
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the built artifacts to TestPyPI"
+        type: boolean
+        default: false
+
+jobs:
+  build_wheels:
+    name: wheels (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.1.0
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: dist-wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
+
+  build_sdist:
+    name: sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build sdist
+        run: pipx run build --sdist
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: dist-sdist
+          path: dist/*.tar.gz
+
+  publish_testpypi:
+    name: publish to TestPyPI
+    needs: [build_wheels, build_sdist]
+    # Publish on a tag push, or a manual run with the publish box checked.
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # OIDC token for PyPI Trusted Publishing (no stored secret)
+    steps:
+      - uses: actions/download-artifact@v7.0.1
+        with:
+          path: dist
+          pattern: dist-*
+          merge-multiple: true
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
