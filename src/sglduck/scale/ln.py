@@ -13,7 +13,12 @@ class SglScaleLn(SglScale):
         return "ln"
 
     def lets_plot_scales(self, aes: str, pgs: dict) -> list:
-        return lets_plot_continuous_scales("log", aes, pgs)
+        # lets-plot has no natural-log axis transform (only log10/log2), where
+        # rsgl uses ggplot2's "log". A log axis is base-invariant in shape — the
+        # auto-ranged coordinate absorbs the constant factor between ln and
+        # log10 — so log10 renders the same plot, differing only in tick-label
+        # style. The exact natural-log data scaling (apply_scale) is unaffected.
+        return lets_plot_continuous_scales("log10", aes, pgs)
 
     def valid_scale(self, aes: str, layers: list[dict], dfs) -> None:
         super().valid_scale(aes, layers, dfs)

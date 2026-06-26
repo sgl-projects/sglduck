@@ -236,22 +236,37 @@ def _as_dicts(scales):
         ("size", lets_plot.scale_size),
     ],
 )
+# lets-plot has no natural-log axis transform, so the ln scale renders with the
+# (base-invariant in shape) log10 transform; see SglScaleLn.lets_plot_scales.
 def test_lets_plot_scales_for_non_color_aes(aes, scale_ctor):
     pgs = sgl_to_pgs(f"visualize hp as {aes} from cars using points")
     assert _as_dicts(SglScaleLn().lets_plot_scales(aes, pgs)) == _as_dicts(
-        [scale_ctor(trans="log")]
+        [scale_ctor(trans="log10")]
     )
 
 
 def test_lets_plot_scales_returns_color_scale_for_non_bar():
     pgs = sgl_to_pgs("visualize hp as x, mpg as y, cyl as color from cars using points")
     assert _as_dicts(SglScaleLn().lets_plot_scales("color", pgs)) == _as_dicts(
-        [lets_plot.scale_color_continuous(trans="log")]
+        [lets_plot.scale_color_continuous(trans="log10")]
     )
 
 
 def test_lets_plot_scales_returns_fill_scale_for_bar():
     pgs = sgl_to_pgs("visualize hp as x, mpg as y, cyl as color from cars using bars")
     assert _as_dicts(SglScaleLn().lets_plot_scales("color", pgs)) == _as_dicts(
-        [lets_plot.scale_fill_continuous(trans="log")]
+        [lets_plot.scale_fill_continuous(trans="log10")]
     )
+
+
+def test_ln_scaled_plot_renders_svg(test_con):
+    # lets-plot rejects an unknown transform name at render time, so exercise the
+    # full pipeline to guard against a transform the backend doesn't support.
+    from sglduck import db_get_plot
+
+    svg = db_get_plot(
+        test_con,
+        "visualize hp as x, mpg as y from cars using points "
+        "scale by ln(x), ln(y)",
+    ).to_svg()
+    assert "<svg" in svg
