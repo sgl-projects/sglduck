@@ -1,10 +1,10 @@
 """Assemble a lets-plot figure from a pgs and its per-layer DataFrames.
 
-Ported from rsgl's ``rgs_to_ggplot2.R``. This slice covers single- and
-multi-layer Cartesian plots with axis/legend titles, continuous scales, the
-regression/jittered/unstacked qualifiers, geom orientation, and faceting. The
-remaining piece of ``rgs_to_ggplot2`` — polar coordinates — lands in a follow-up
-rendering PR.
+Ported from rsgl's ``rgs_to_ggplot2.R``. This covers single- and multi-layer
+plots with axis/legend titles, continuous scales, the regression/jittered/
+unstacked qualifiers, geom orientation, faceting, and polar coordinates (the
+``theta``/``r`` aesthetics). The ``theta``/``r``-to-``x``/``y`` fold happens in
+``SglGeom.lets_plot_aes``; this module adds the polar coordinate system on top.
 """
 
 from __future__ import annotations
@@ -87,6 +87,11 @@ def rgs_to_lets_plot(pgs: dict, dfs: list):
     for aes, scale in scales.items():
         for scale_feature in scale.lets_plot_scales(aes, pgs):
             plot += scale_feature
+    # theta/r map onto x/y (the fold lives in lets_plot_aes); a theta mapping is
+    # what makes the plot polar. All layers share the coordinate system, so the
+    # first layer settles it.
+    if "theta" in pgs["layers"][0]["aes_mappings"]:
+        plot += lets_plot.coord_polar(theta="x")
     if "facets" in pgs:
         plot += lets_plot_facet(pgs["facets"])
     plot += lets_plot_labs(pgs)

@@ -1,8 +1,7 @@
-"""Tests for rgs_to_lets_plot (port of test-rgs_to_ggplot2.R, Cartesian slice).
+"""Tests for rgs_to_lets_plot (port of test-rgs_to_ggplot2.R).
 
-Covers the Cartesian default-qualifier, scale, qualifier/orientation, and facet
-cases; the polar and labs cases arrive with the follow-up rendering PRs that
-implement those branches.
+Covers the default-qualifier, scale, qualifier/orientation, facet, and polar
+coordinate cases; the labs cases arrive with a follow-up rendering PR.
 """
 
 import pytest
@@ -179,3 +178,40 @@ def test_two_facets_fill_columns_and_rows(test_con, facet_clause, expected_x, ex
     facet = _facet(test_con, _FACET_BASE + facet_clause)
     assert facet["x"] == expected_x
     assert facet["y"] == expected_y
+
+
+POLAR_STMT = "visualize hp as theta, mpg as r from cars using points"
+
+
+def _spec(con, sgl):
+    pgs = sgl_to_pgs(sgl)
+    dfs = result_dfs(pgs, con)
+    return rgs_to_lets_plot(pgs, dfs).as_dict()
+
+
+def test_no_polar_coordinates_without_theta(test_con):
+    assert _spec(test_con, POINTS_STMT).get("coord") is None
+
+
+def test_polar_coordinates_for_theta_and_r(test_con):
+    assert _spec(test_con, POLAR_STMT)["coord"]["name"] == "polar"
+
+
+def test_theta_and_r_map_to_x_and_y_in_polar_coordinates(test_con):
+    spec = _spec(test_con, POLAR_STMT)
+    assert spec["coord"]["theta"] == "x"
+    assert spec["layers"][0]["mapping"] == {"x": "hp", "y": "mpg"}
+
+
+def test_polar_coordinates_with_multiple_layers(test_con):
+    spec = _spec(
+        test_con,
+        "visualize hp as theta, mpg as r from cars using points "
+        "layer "
+        "visualize hp as theta, mpg as r from cars using regression line",
+    )
+    assert spec["coord"]["name"] == "polar"
+    assert spec["coord"]["theta"] == "x"
+    for layer in spec["layers"]:
+        assert layer["mapping"]["x"] == "hp"
+        assert layer["mapping"]["y"] == "mpg"
