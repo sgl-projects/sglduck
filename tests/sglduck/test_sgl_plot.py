@@ -5,10 +5,11 @@ rgs_to_lets_plot pipeline to SVG, compared against a committed baseline under
 ``tests/baseline/`` (see the ``svg_snapshot`` fixture in conftest). Regenerate
 the baselines with ``pytest --snapshot-update`` and review the diff.
 
-These carry the ``snapshot`` marker and are a local visual-regression tool: the
-baselines are platform-specific (lets-plot renders the same plot slightly
-differently per OS), so CI excludes them (``pytest -m "not snapshot"``) and runs
-the platform-stable suite instead. Regenerate on the platform you compare on.
+These carry the ``snapshot`` marker. The baselines are platform-specific
+(lets-plot renders the same plot slightly differently per OS) and are generated
+on macOS, so CI runs them in a dedicated macOS job while the cross-platform
+matrix runs the platform-stable suite (``pytest -m "not snapshot"``). Regenerate
+on macOS so the baselines match.
 """
 
 import pytest
