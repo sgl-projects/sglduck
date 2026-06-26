@@ -95,7 +95,8 @@ def test_jittered_qualifier_uses_jitter_position(test_con):
     layer = _first_layer_dict(
         test_con, "visualize hp as x, mpg as y from cars using jittered points"
     )
-    assert layer["position"] == "jitter"
+    # the jitter is seeded so the plot renders reproducibly
+    assert layer["position"] == {"name": "jitter", "seed": 0}
 
 
 def test_unstacked_qualifier_uses_identity_position(test_con):
