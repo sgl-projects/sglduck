@@ -45,3 +45,18 @@ def test_renders_html(test_con):
 )
 def test_qualifier_statements_render_svg(test_con, stmt):
     assert "<svg" in db_get_plot(test_con, stmt).to_svg()
+
+
+@pytest.mark.parametrize(
+    "stmt",
+    [
+        "visualize letter as x, number as y from synth using points "
+        "facet by boolean",
+        "visualize letter as x, number as y from synth using points "
+        "facet by boolean vertically",
+        "visualize day as x, number as y from synth using points "
+        "facet by letter, boolean",
+    ],
+)
+def test_faceted_statements_render_svg(test_con, stmt):
+    assert "<svg" in db_get_plot(test_con, stmt).to_svg()

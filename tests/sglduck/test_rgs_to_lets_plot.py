@@ -1,7 +1,7 @@
 """Tests for rgs_to_lets_plot (port of test-rgs_to_ggplot2.R, Cartesian slice).
 
-Covers the Cartesian default-qualifier, scale, and qualifier/orientation cases;
-the facet, polar, and labs cases arrive with the follow-up rendering PRs that
+Covers the Cartesian default-qualifier, scale, qualifier/orientation, and facet
+cases; the polar and labs cases arrive with the follow-up rendering PRs that
 implement those branches.
 """
 
@@ -130,3 +130,52 @@ def test_orientation_present_when_geom_has_direction(test_con):
         "visualize bin(mpg) as y, count(*) as x from cars using horizontal bars",
     )
     assert layer["orientation"] == "y"
+
+
+def _facet(con, sgl):
+    pgs = sgl_to_pgs(sgl)
+    dfs = result_dfs(pgs, con)
+    return rgs_to_lets_plot(pgs, dfs).as_dict().get("facet")
+
+
+_FACET_BASE = "visualize letter as x, number as y from synth using points facet by "
+
+
+def test_no_facet_without_facet_by_clause(test_con):
+    assert _facet(test_con, "visualize letter as x, number as y from synth using points") is None
+
+
+def test_single_default_facet_is_a_column(test_con):
+    facet = _facet(test_con, _FACET_BASE + "boolean")
+    assert facet["x"] == "boolean"
+    assert "y" not in facet
+
+
+def test_single_horizontal_facet_is_a_column(test_con):
+    facet = _facet(test_con, _FACET_BASE + "boolean horizontally")
+    assert facet["x"] == "boolean"
+    assert "y" not in facet
+
+
+def test_single_vertical_facet_is_a_row(test_con):
+    facet = _facet(test_con, _FACET_BASE + "boolean vertically")
+    assert facet["y"] == "boolean"
+    assert "x" not in facet
+
+
+# For two facets, "x" holds the horizontal (column) facet and "y" the vertical
+# (row) facet. The cases mirror test-rgs_to_ggplot2.R.
+@pytest.mark.parametrize(
+    "facet_clause,expected_x,expected_y",
+    [
+        ("letter, boolean", "letter", "boolean"),
+        ("letter, boolean horizontally", "boolean", "letter"),
+        ("letter, boolean vertically", "letter", "boolean"),
+        ("letter horizontally, boolean vertically", "letter", "boolean"),
+        ("letter vertically, boolean horizontally", "boolean", "letter"),
+    ],
+)
+def test_two_facets_fill_columns_and_rows(test_con, facet_clause, expected_x, expected_y):
+    facet = _facet(test_con, _FACET_BASE + facet_clause)
+    assert facet["x"] == expected_x
+    assert facet["y"] == expected_y

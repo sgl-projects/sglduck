@@ -2,9 +2,9 @@
 
 Ported from rsgl's ``rgs_to_ggplot2.R``. This slice covers single- and
 multi-layer Cartesian plots with axis/legend titles, continuous scales, the
-regression/jittered/unstacked qualifiers, and geom orientation. The remaining
-pieces of ``rgs_to_ggplot2`` — facets and polar coordinates — land in follow-up
-rendering PRs.
+regression/jittered/unstacked qualifiers, geom orientation, and faceting. The
+remaining piece of ``rgs_to_ggplot2`` — polar coordinates — lands in a follow-up
+rendering PR.
 """
 
 from __future__ import annotations
@@ -44,6 +44,40 @@ def lets_plot_layer(layer: dict, df, scales: dict):
     return geom.lets_plot_geom()(**layer_args)
 
 
+def lets_plot_facet(facets: list[dict]):
+    """Build the lets-plot ``facet_grid`` feature from the pgs facets.
+
+    Mirrors rsgl's ``ggplot_facet``: a single facet occupies columns
+    (``x``, horizontal) or rows (``y``, vertical); two facets fill both axes,
+    resolving which column is horizontal vs vertical from their directions. Two
+    default facets put the second on columns and the first on rows; when only
+    one direction is given the other facet takes the opposite axis.
+    """
+    if len(facets) == 1:
+        column = facets[0]["column"]
+        if facets[0]["direction"] in ("default", "horizontal"):
+            return lets_plot.facet_grid(x=column)
+        return lets_plot.facet_grid(y=column)
+
+    directions = [facet["direction"] for facet in facets]
+    columns = [facet["column"] for facet in facets]
+    if set(directions) == {"default"}:
+        horizontal_index, vertical_index = 1, 0
+    elif set(directions) == {"horizontal", "vertical"}:
+        horizontal_index = directions.index("horizontal")
+        vertical_index = directions.index("vertical")
+    elif "horizontal" in directions:
+        horizontal_index = directions.index("horizontal")
+        vertical_index = 1 - horizontal_index
+    else:
+        vertical_index = directions.index("vertical")
+        horizontal_index = 1 - vertical_index
+    return lets_plot.facet_grid(
+        x=columns[horizontal_index],
+        y=columns[vertical_index],
+    )
+
+
 def rgs_to_lets_plot(pgs: dict, dfs: list):
     """Build the lets-plot figure for a pgs and its post-CTA per-layer frames."""
     scales = pgs.get("scales") or {}
@@ -53,5 +87,7 @@ def rgs_to_lets_plot(pgs: dict, dfs: list):
     for aes, scale in scales.items():
         for scale_feature in scale.lets_plot_scales(aes, pgs):
             plot += scale_feature
+    if "facets" in pgs:
+        plot += lets_plot_facet(pgs["facets"])
     plot += lets_plot_labs(pgs)
     return plot
