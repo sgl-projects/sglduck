@@ -68,3 +68,6 @@ package-dir = { "" = "src" }
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["sglduck*"]
+
+[tool.setuptools.package-data]
+"sglduck.data" = ["*.csv"]

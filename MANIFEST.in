@@ -2,6 +2,8 @@
 # C/C++ compiler. Exclude the developer-only grammar sources and makefile
 # (bison/flex regeneration) so they stay out of the published sdist.
 graft src/_sgl
+# Ship the bundled example datasets.
+recursive-include src/sglduck/data *.csv
 global-exclude *.o *.so
 exclude src/_sgl/parser.y
 exclude src/_sgl/scanner.l
