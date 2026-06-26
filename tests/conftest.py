@@ -8,6 +8,7 @@ economics, and diamonds datasets are vendored as CSV files under ``tests/data``.
 from __future__ import annotations
 
 import datetime
+import re
 
 from pathlib import Path
 
@@ -16,6 +17,60 @@ import polars as pl
 import pytest
 
 _DATA_DIR = Path(__file__).parent / "data"
+_BASELINE_DIR = Path(__file__).parent / "baseline"
+
+# lets-plot scopes each render's CSS and clip paths with freshly generated ids
+# (the only source of run-to-run variation in its SVG); replace them with stable
+# placeholders so a snapshot compares only the meaningful output.
+_SVG_ID_RE = re.compile(r'id="([^"]+)"')
+
+
+def _normalize_svg(svg: str) -> str:
+    for index, generated_id in enumerate(dict.fromkeys(_SVG_ID_RE.findall(svg))):
+        svg = svg.replace(generated_id, f"__id{index}__")
+    return svg
+
+
+class _SvgSnapshot:
+    """Compare a plot's SVG against a committed baseline (vdiffr-style).
+
+    With ``--snapshot-update`` the baseline is (re)written instead of compared,
+    so baselines are regenerated deliberately and reviewed in the diff.
+    """
+
+    def __init__(self, update: bool):
+        self._update = update
+
+    def assert_match(self, name: str, svg: str) -> None:
+        path = _BASELINE_DIR / f"{name}.svg"
+        actual = _normalize_svg(svg)
+        if self._update:
+            _BASELINE_DIR.mkdir(exist_ok=True)
+            path.write_text(actual)
+            return
+        if not path.exists():
+            raise AssertionError(
+                f"No SVG snapshot baseline for {name!r}; "
+                "generate it with: pytest --snapshot-update"
+            )
+        assert actual == path.read_text(), (
+            f"SVG snapshot mismatch for {name!r}; if the change is intended, "
+            "refresh with: pytest --snapshot-update"
+        )
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--snapshot-update",
+        action="store_true",
+        default=False,
+        help="Write lets-plot SVG snapshot baselines instead of comparing.",
+    )
+
+
+@pytest.fixture
+def svg_snapshot(request):
+    return _SvgSnapshot(request.config.getoption("--snapshot-update"))
 
 
 def create_con_and_load_data():

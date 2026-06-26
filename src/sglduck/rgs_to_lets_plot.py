@@ -67,9 +67,11 @@ def lets_plot_layer(layer: dict, df, scales: dict):
         layer_args["method"] = "lm"
     elif not isinstance(geom, SglGeomBox):
         layer_args["stat"] = "identity"
-    # The jittered/unstacked qualifiers select a non-default position.
+    # The jittered/unstacked qualifiers select a non-default position. The jitter
+    # is seeded so a plot renders reproducibly (lets-plot seeds jitter per
+    # position object, not via a global RNG; rsgl's tests fix it with set.seed(0)).
     if qual == "jittered":
-        layer_args["position"] = "jitter"
+        layer_args["position"] = lets_plot.position_jitter(seed=0)
     elif qual == "unstacked":
         layer_args["position"] = "identity"
     # Direction-aware geoms (bar/line/box) carry an x/y orientation.

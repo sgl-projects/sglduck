@@ -95,7 +95,8 @@ def test_jittered_qualifier_uses_jitter_position(test_con):
     layer = _first_layer_dict(
         test_con, "visualize hp as x, mpg as y from cars using jittered points"
     )
-    assert layer["position"] == "jitter"
+    # the jitter is seeded so the plot renders reproducibly
+    assert layer["position"] == {"name": "jitter", "seed": 0}
 
 
 def test_unstacked_qualifier_uses_identity_position(test_con):
@@ -178,6 +179,26 @@ def test_two_facets_fill_columns_and_rows(test_con, facet_clause, expected_x, ex
     facet = _facet(test_con, _FACET_BASE + facet_clause)
     assert facet["x"] == expected_x
     assert facet["y"] == expected_y
+
+
+def test_bar_color_aesthetic_maps_to_fill(test_con):
+    # bars colour their interior, so color maps onto fill, not the stroke
+    layer = _first_layer_dict(
+        test_con,
+        "visualize letter as x, number as y, boolean as color "
+        "from synth using bars",
+    )
+    assert layer["mapping"].get("fill") == "boolean"
+    assert "color" not in layer["mapping"]
+
+
+def test_non_bar_color_aesthetic_maps_to_color(test_con):
+    layer = _first_layer_dict(
+        test_con,
+        "visualize hp as x, mpg as y, cyl as color from cars using points",
+    )
+    assert layer["mapping"].get("color") == "cyl"
+    assert "fill" not in layer["mapping"]
 
 
 POLAR_STMT = "visualize hp as theta, mpg as r from cars using points"
