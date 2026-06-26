@@ -52,11 +52,29 @@ _SGL_SOURCES = [
     "src/_sgl/cgs_order.c",
 ]
 
-# sgl_error() throws a C++ exception that must unwind through the C parser
-# frames (sgl_to_cgs / yyparse) to reach the bridge. -fexceptions makes that
-# unwinding well-defined for the C sources on GCC/Clang. (MSVC enables C++
-# exception unwinding through extern "C" by default.)
-_extra_compile_args = [] if sys.platform == "win32" else ["-fexceptions"]
+_define_macros = []
+
+if sys.platform == "win32":
+    # The committed flex/parser sources are written for a POSIX toolchain (as in
+    # rsgl, which builds on Windows with GCC-based Rtools). MSVC needs help:
+    #   - YY_NO_UNISTD_H: the flex scanner guards its <unistd.h> include with it;
+    #     MSVC has no unistd.h (the shim's <io.h> declares isatty/fileno instead).
+    #   - the _CRT_*_NO_WARNINGS macros allow the POSIX names (strdup, isatty,
+    #     fileno) and classic printf/strcpy without MSVC's _s variants.
+    #   - /FI force-includes the compat shim (asprintf) into every translation
+    #     unit, so the committed sources stay byte-for-byte in step with rsgl.
+    _define_macros += [
+        ("YY_NO_UNISTD_H", None),
+        ("_CRT_NONSTDC_NO_WARNINGS", None),
+        ("_CRT_SECURE_NO_WARNINGS", None),
+    ]
+    _extra_compile_args = ["/FIsgl_win_compat.h"]
+else:
+    # sgl_error() throws a C++ exception that must unwind through the C parser
+    # frames (sgl_to_cgs / yyparse) to reach the bridge. -fexceptions makes that
+    # unwinding well-defined for the C sources on GCC/Clang. (MSVC enables C++
+    # exception unwinding through extern "C" by default.)
+    _extra_compile_args = ["-fexceptions"]
 
 ext_modules = [
     Pybind11Extension(
@@ -64,6 +82,7 @@ ext_modules = [
         sources=_SGL_SOURCES,
         include_dirs=["src/_sgl"],
         extra_compile_args=_extra_compile_args,
+        define_macros=_define_macros,
     )
 ]
 
