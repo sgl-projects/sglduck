@@ -12,11 +12,9 @@ from __future__ import annotations
 
 import lets_plot
 
+from .constants import POLAR_TO_CART_AES
 from .geom import SglGeomBar
 from .utils import all_aesthetics
-
-# theta/r fold onto the Cartesian x/y axis labels.
-_POLAR_TO_CART = {"theta": "x", "r": "y"}
 
 
 def default_title(col_expr: dict) -> str:
@@ -62,7 +60,7 @@ def labs_args(pgs: dict) -> dict:
     """The aesthetic -> title mapping for the plot's labels."""
     all_aes = all_aesthetics(pgs)
     args = {
-        _POLAR_TO_CART.get(aes, aes): title_for_aes(aes, pgs)
+        POLAR_TO_CART_AES.get(aes, aes): title_for_aes(aes, pgs)
         for aes in all_aes
         if aes != "color"
     }

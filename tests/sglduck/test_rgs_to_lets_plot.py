@@ -215,3 +215,24 @@ def test_polar_coordinates_with_multiple_layers(test_con):
     for layer in spec["layers"]:
         assert layer["mapping"]["x"] == "hp"
         assert layer["mapping"]["y"] == "mpg"
+
+
+@pytest.mark.parametrize(
+    "stmt,blank_axis,mapped_axis",
+    [
+        ("visualize mpg as x from cars using boxes", "y", "x"),
+        ("visualize mpg as y from cars using boxes", "x", "y"),
+    ],
+)
+def test_unmapped_positional_axis_is_blanked(test_con, stmt, blank_axis, mapped_axis):
+    spec = _spec(test_con, stmt)
+    layer = spec["layers"][0]
+    assert layer["mapping"][blank_axis] == "sglduck.blank"
+    assert layer["mapping"][mapped_axis] == "mpg"
+    assert spec["theme"][f"axis_ticks_{blank_axis}"] == {"blank": True}
+
+
+def test_two_aes_plot_has_no_blank_axis(test_con):
+    spec = _spec(test_con, POINTS_STMT)
+    assert "sglduck.blank" not in spec["layers"][0]["mapping"].values()
+    assert spec.get("theme") is None

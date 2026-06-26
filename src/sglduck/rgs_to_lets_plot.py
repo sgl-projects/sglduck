@@ -2,18 +2,48 @@
 
 Ported from rsgl's ``rgs_to_ggplot2.R``. This covers single- and multi-layer
 plots with axis/legend titles, continuous scales, the regression/jittered/
-unstacked qualifiers, geom orientation, faceting, and polar coordinates (the
-``theta``/``r`` aesthetics). The ``theta``/``r``-to-``x``/``y`` fold happens in
-``SglGeom.lets_plot_aes``; this module adds the polar coordinate system on top.
+unstacked qualifiers, geom orientation, faceting, polar coordinates (the
+``theta``/``r`` aesthetics), and single-positional-aesthetic plots whose unmapped
+axis is blanked. The ``theta``/``r``-to-``x``/``y`` fold happens in
+``SglGeom.lets_plot_aes``; this module adds the coordinate system and the
+blank-axis handling on top.
 """
 
 from __future__ import annotations
 
 import lets_plot
+import polars as pl
 
+from .constants import BLANK_AES_COLUMN, POLAR_TO_CART_AES, POS_AES
 from .geom import SglGeomBox
 from .lets_plot_direction import lets_plot_direction
 from .titles import lets_plot_labs
+
+
+def _unmapped_cart_axes(layer: dict) -> set[str]:
+    """The Cartesian axes (``"x"``/``"y"``) the layer leaves unmapped, after the
+    theta/r fold."""
+    mapped = {
+        POLAR_TO_CART_AES.get(aes, aes)
+        for aes in layer["aes_mappings"]
+        if aes in POS_AES
+    }
+    return {"x", "y"} - mapped
+
+
+def _blank_axis_features(layer: dict) -> list:
+    """labs + theme features that hide a layer's unmapped positional axes.
+
+    Mirrors rsgl's ``labs(<axis> = NULL)`` plus blank axis ticks: the axis only
+    pins the data to a constant, so its title and ticks carry no meaning.
+    """
+    features = []
+    for axis in sorted(_unmapped_cart_axes(layer)):
+        features.append(lets_plot.labs(**{axis: ""}))
+        features.append(
+            lets_plot.theme(**{f"axis_ticks_{axis}": lets_plot.element_blank()})
+        )
+    return features
 
 
 def lets_plot_layer(layer: dict, df, scales: dict):
@@ -21,6 +51,10 @@ def lets_plot_layer(layer: dict, df, scales: dict):
     geom_expr = layer["geom_expr"]
     geom = geom_expr["geom"]
     qual = geom_expr["qual"]
+    # An unmapped positional aesthetic is pinned to a constant blank column;
+    # lets-plot has no constant-aesthetic literal, so add it to the data.
+    if _unmapped_cart_axes(layer):
+        df = df.with_columns(pl.lit("").alias(BLANK_AES_COLUMN))
     layer_args = {
         "data": df,
         "mapping": geom.lets_plot_aes(layer, df, scales),
@@ -84,6 +118,8 @@ def rgs_to_lets_plot(pgs: dict, dfs: list):
     plot = lets_plot.ggplot()
     for layer, df in zip(pgs["layers"], dfs):
         plot += lets_plot_layer(layer, df, scales)
+    for feature in _blank_axis_features(pgs["layers"][0]):
+        plot += feature
     for aes, scale in scales.items():
         for scale_feature in scale.lets_plot_scales(aes, pgs):
             plot += scale_feature
