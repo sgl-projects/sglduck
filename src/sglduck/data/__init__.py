@@ -20,7 +20,10 @@ import polars as pl
 def _load(filename: str) -> pl.DataFrame:
     source = resources.files(__package__) / filename
     with resources.as_file(source) as path:
-        return pl.read_csv(path)
+        # "NA" marks missing values; scanning the whole (small) file means a
+        # column with late floats or nulls still infers a numeric type — without
+        # this, the "NA" strings make polars read numeric columns as strings.
+        return pl.read_csv(path, null_values="NA", infer_schema_length=None)
 
 
 def cars() -> pl.DataFrame:
