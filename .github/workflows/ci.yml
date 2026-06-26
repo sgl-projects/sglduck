@@ -29,9 +29,24 @@ jobs:
         shell: bash
         run: pip install ".[test]"
       - name: Run tests
-        # The lets-plot SVG snapshot tests are excluded: their baselines are
-        # platform-specific (lets-plot renders differently per OS), so they are
-        # a local visual-regression tool, not CI-enforced. Everything else —
-        # the build and all platform-stable tests — runs here.
+        # The lets-plot SVG snapshot tests run in the dedicated `snapshot` job
+        # (their baselines are platform-specific); the matrix runs everything
+        # else — the build and all platform-stable tests.
         shell: bash
         run: pytest -m "not snapshot"
+
+  snapshot:
+    name: visual snapshots (macos)
+    # The baselines are platform-specific; they are generated on macOS, so the
+    # snapshot job runs on macOS too. lets-plot is pinned to the baseline version
+    # since its SVG output changes between releases.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install (compiles the _sgl extension)
+        run: pip install ".[test]" "lets-plot==4.10.1"
+      - name: Run visual snapshot tests
+        run: pytest -m snapshot
