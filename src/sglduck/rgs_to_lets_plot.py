@@ -3,10 +3,10 @@
 Ported from rsgl's ``rgs_to_ggplot2.R``. This covers single- and multi-layer
 plots with axis/legend titles, continuous scales, the regression/jittered/
 unstacked qualifiers, geom orientation, faceting, polar coordinates (the
-``theta``/``r`` aesthetics), and single-positional-aesthetic plots whose unmapped
-axis is blanked. The ``theta``/``r``-to-``x``/``y`` fold happens in
-``SglGeom.lets_plot_aes``; this module adds the coordinate system and the
-blank-axis handling on top.
+``theta``/``r`` aesthetics), single-positional-aesthetic plots whose unmapped
+axis is blanked, and collective grouping. The geom supplies its aesthetic args
+and grouping columns; this module assembles them and adds the coordinate system,
+blank-axis handling, and the group aesthetic on top.
 """
 
 from __future__ import annotations
@@ -55,9 +55,15 @@ def lets_plot_layer(layer: dict, df, scales: dict):
     # lets-plot has no constant-aesthetic literal, so add it to the data.
     if _unmapped_cart_axes(layer):
         df = df.with_columns(pl.lit("").alias(BLANK_AES_COLUMN))
+    aes_args = geom.lets_plot_aes_args(layer, df, scales)
+    # Split the layer into collective groups; lets-plot's group aesthetic takes
+    # a list of columns, grouping by their combination.
+    group_cols = geom.group_cols(layer, df, scales)
+    if group_cols:
+        aes_args["group"] = group_cols
     layer_args = {
         "data": df,
-        "mapping": geom.lets_plot_aes(layer, df, scales),
+        "mapping": lets_plot.aes(**aes_args),
     }
     # rsgl uses a smooth (linear-model) stat for the regression qualifier and an
     # identity stat for every other non-box geom; the box geom keeps its default
@@ -125,7 +131,7 @@ def rgs_to_lets_plot(pgs: dict, dfs: list):
     for aes, scale in scales.items():
         for scale_feature in scale.lets_plot_scales(aes, pgs):
             plot += scale_feature
-    # theta/r map onto x/y (the fold lives in lets_plot_aes); a theta mapping is
+    # theta/r map onto x/y (the fold lives in lets_plot_aes_args); a theta mapping is
     # what makes the plot polar. All layers share the coordinate system, so the
     # first layer settles it.
     if "theta" in pgs["layers"][0]["aes_mappings"]:

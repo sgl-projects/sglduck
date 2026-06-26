@@ -1,7 +1,7 @@
 """Tests for SglGeomBox (pure methods only).
 
-``group_aes_cols`` and ``lets_plot_aes`` require a layer/DataFrame/scales and are
-deferred to the rendering milestone.
+``default_group_cols`` and the aesthetic mapping take a layer/DataFrame/scales
+and are covered by the rendering tests (``test_rgs_to_lets_plot``).
 """
 
 import lets_plot

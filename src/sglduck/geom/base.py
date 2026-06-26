@@ -3,17 +3,15 @@
 As with CTAs, a geom's behaviour lives in methods on the class hierarchy. Geoms
 are stateless value objects with class-based equality and hashing.
 
-``lets_plot_aes`` builds a layer's positional/non-positional aesthetic mapping.
-Collective grouping (the ``collect by`` clause, ``group_aes_cols``) belongs to a
-later rendering PR and is not defined here yet.
+``lets_plot_aes_args`` builds a layer's positional/non-positional aesthetic
+mapping; ``group_cols`` resolves how the layer splits into collective groups.
+``lets_plot_layer`` (in ``rgs_to_lets_plot``) assembles these into the geom.
 """
 
 from __future__ import annotations
 
-import lets_plot
-
 from ..constants import BLANK_AES_COLUMN, POLAR_TO_CART_AES
-from .utils import mapping_col_name
+from .utils import collection_group_cols, mapping_col_name
 
 
 class SglGeom:
@@ -39,12 +37,21 @@ class SglGeom:
         aes_args.setdefault("y", BLANK_AES_COLUMN)
         return aes_args
 
-    def lets_plot_aes(self, layer: dict, df, scales: dict):
-        """Build the lets-plot ``aes`` mapping for this layer.
+    def group_cols(self, layer: dict, df, scales: dict) -> list[str]:
+        """The df columns the layer splits into separate groups by.
 
-        Mirrors rsgl's ``ggplot_aes.sgl_geom``.
+        An explicit ``collect by`` clause takes precedence; otherwise a geom may
+        define a default collection (see ``default_group_cols``). Mirrors rsgl's
+        collections handling plus the per-geom ``group_aes_cols``.
         """
-        return lets_plot.aes(**self.lets_plot_aes_args(layer, df, scales))
+        collected = collection_group_cols(layer, scales)
+        if collected:
+            return collected
+        return self.default_group_cols(layer, df, scales)
+
+    def default_group_cols(self, layer: dict, df, scales: dict) -> list[str]:
+        """The geom's default grouping columns (none for non-collective geoms)."""
+        return []
 
     def __eq__(self, other: object) -> bool:
         return type(self) is type(other)
