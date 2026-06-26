@@ -1,8 +1,8 @@
 """Tests for rgs_to_lets_plot (port of test-rgs_to_ggplot2.R, Cartesian slice).
 
-Only the default-qualifier Cartesian cases are ported here; the scale, facet,
-polar, labs, and qualifier/orientation cases arrive with the follow-up rendering
-PRs that implement those branches.
+Covers the Cartesian default-qualifier, scale, and qualifier/orientation cases;
+the facet, polar, and labs cases arrive with the follow-up rendering PRs that
+implement those branches.
 """
 
 import pytest
@@ -76,3 +76,57 @@ def test_scales_from_scale_by_clause(test_con):
     by_aes = {scale["aesthetic"]: scale for scale in scales}
     assert by_aes["x"]["trans"] == "log10"
     assert by_aes["color"]["trans"] == "identity"
+
+
+def _first_layer_dict(con, sgl):
+    pgs = sgl_to_pgs(sgl)
+    dfs = result_dfs(pgs, con)
+    return rgs_to_lets_plot(pgs, dfs).as_dict()["layers"][0]
+
+
+def test_regression_qualifier_uses_smooth_lm_stat(test_con):
+    layer = _first_layer_dict(
+        test_con, "visualize hp as x, mpg as y from cars using regression line"
+    )
+    assert layer["stat"] == "smooth"
+    assert layer["method"] == "lm"
+
+
+def test_jittered_qualifier_uses_jitter_position(test_con):
+    layer = _first_layer_dict(
+        test_con, "visualize hp as x, mpg as y from cars using jittered points"
+    )
+    assert layer["position"] == "jitter"
+
+
+def test_unstacked_qualifier_uses_identity_position(test_con):
+    layer = _first_layer_dict(
+        test_con,
+        "visualize letter as x, number as y, boolean as color "
+        "from synth using unstacked bars",
+    )
+    assert layer["position"] == "identity"
+
+
+def test_box_geom_keeps_default_boxplot_stat(test_con):
+    # lets-plot leaves the default boxplot stat implicit (no "stat" key); the
+    # box geom must not be given a forced identity/smooth stat that overrides it.
+    layer = _first_layer_dict(
+        test_con, "visualize cut as x, price as y from diamonds using boxes"
+    )
+    assert "stat" not in layer
+
+
+def test_no_orientation_when_geom_lacks_direction(test_con):
+    layer = _first_layer_dict(
+        test_con, "visualize hp as x, mpg as y from cars using points"
+    )
+    assert "orientation" not in layer
+
+
+def test_orientation_present_when_geom_has_direction(test_con):
+    layer = _first_layer_dict(
+        test_con,
+        "visualize bin(mpg) as y, count(*) as x from cars using horizontal bars",
+    )
+    assert layer["orientation"] == "y"

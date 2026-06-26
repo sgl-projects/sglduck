@@ -26,5 +26,8 @@ class SglGeomLine(SglGeom):
     def has_direction(self) -> bool:
         return True
 
+    def lets_plot_dir_from_qual(self, qual: str) -> str:
+        return "x" if qual == "horizontal" else "y"
+
     def lets_plot_geom(self):
         return lets_plot.geom_line
