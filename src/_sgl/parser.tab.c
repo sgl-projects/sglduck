@@ -565,11 +565,11 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,    51,    51,    53,    54,    56,    57,    58,    60,    61,
-      63,    63,    73,   104,   127,   128,   130,   131,   133,   141,
-     147,   148,   150,   172,   193,   214,   226,   236,   237,   239,
-     240,   242,   251,   252,   254,   255,   257,   266,   268,   269,
-     271,   305,   307,   308,   310,   324,   325,   326,   328,   330,
-     331,   333
+      63,    63,    74,   105,   128,   129,   131,   132,   134,   142,
+     148,   149,   151,   173,   194,   215,   227,   237,   238,   240,
+     241,   243,   252,   253,   255,   256,   258,   267,   269,   270,
+     272,   306,   308,   309,   311,   325,   326,   327,   329,   331,
+     332,   334
 };
 #endif
 
@@ -1196,23 +1196,24 @@ yyreduce:
                             {
 	struct layer *new_layer = malloc(sizeof(struct layer));
 	new_layer->aes_mappings=NULL;
+	new_layer->source_sql_query=NULL;
 	new_layer->geoms=NULL;
 	new_layer->groupings=NULL;
 	new_layer->collections=NULL;
 	new_layer->next=cgs->layers;
 	cgs->layers=new_layer;
 }
-#line 1206 "src/_sgl/parser.tab.c"
+#line 1207 "src/_sgl/parser.tab.c"
     break;
 
   case 11: /* layer_expression: VISUALIZE $@1 aes_mappings from_clause grouping_clause collection_clause using_clause  */
-#line 71 "src/_sgl/parser.y"
+#line 72 "src/_sgl/parser.y"
                                                                           {}
-#line 1212 "src/_sgl/parser.tab.c"
+#line 1213 "src/_sgl/parser.tab.c"
     break;
 
   case 12: /* geom_expr: UNQUOTED_STRING UNQUOTED_STRING  */
-#line 73 "src/_sgl/parser.y"
+#line 74 "src/_sgl/parser.y"
                                            {
 	char *qual_str=(yyvsp[-1].str);
 	str_tolower(qual_str);	
@@ -1245,11 +1246,11 @@ yyreduce:
 	new_geom->next = cgs->layers->geoms;
 	cgs->layers->geoms = new_geom;
 }
-#line 1249 "src/_sgl/parser.tab.c"
+#line 1250 "src/_sgl/parser.tab.c"
     break;
 
   case 13: /* geom_expr: UNQUOTED_STRING  */
-#line 104 "src/_sgl/parser.y"
+#line 105 "src/_sgl/parser.y"
                     {
 	enum qual qual=DEFAULT;
 	int print_result;
@@ -1272,11 +1273,11 @@ yyreduce:
 	new_geom->next = cgs->layers->geoms;
 	cgs->layers->geoms = new_geom;
 }
-#line 1276 "src/_sgl/parser.tab.c"
+#line 1277 "src/_sgl/parser.tab.c"
     break;
 
   case 18: /* from_clause: FROM TABLE_NAME  */
-#line 133 "src/_sgl/parser.y"
+#line 134 "src/_sgl/parser.y"
                              {
 	char *table_name = (yyvsp[0].str);
 	int print_result;
@@ -1286,21 +1287,21 @@ yyreduce:
 	}
 	free(table_name);
 }
-#line 1290 "src/_sgl/parser.tab.c"
+#line 1291 "src/_sgl/parser.tab.c"
     break;
 
   case 19: /* from_clause: FROM SQL_SUBQUERY  */
-#line 141 "src/_sgl/parser.y"
+#line 142 "src/_sgl/parser.y"
                       {
 	char *sql_subquery=(yyvsp[0].str);
 	cgs->layers->source_sql_query=strdup(sql_subquery);
 	free(sql_subquery);
 }
-#line 1300 "src/_sgl/parser.tab.c"
+#line 1301 "src/_sgl/parser.tab.c"
     break;
 
   case 22: /* aes_mapping: col_expr AS UNQUOTED_STRING  */
-#line 150 "src/_sgl/parser.y"
+#line 151 "src/_sgl/parser.y"
                                          {
 	char *aes_str=(yyvsp[0].str);
 	str_tolower(aes_str);
@@ -1322,11 +1323,11 @@ yyreduce:
 
 	cgs->layers->aes_mappings=new_mapping;
 }
-#line 1326 "src/_sgl/parser.tab.c"
+#line 1327 "src/_sgl/parser.tab.c"
     break;
 
   case 23: /* col_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')'  */
-#line 172 "src/_sgl/parser.y"
+#line 173 "src/_sgl/parser.y"
                                                   {
 	char *cta_str=(yyvsp[-3].str);
 	str_tolower(cta_str);	
@@ -1349,11 +1350,11 @@ yyreduce:
 	free(column_name);
 
 }
-#line 1353 "src/_sgl/parser.tab.c"
+#line 1354 "src/_sgl/parser.tab.c"
     break;
 
   case 24: /* col_expr: UNQUOTED_STRING '(' UNQUOTED_STRING COMMA fn_arg ')'  */
-#line 193 "src/_sgl/parser.y"
+#line 194 "src/_sgl/parser.y"
                                                          {
 	char *cta_str=(yyvsp[-5].str);
 	str_tolower(cta_str);	
@@ -1376,11 +1377,11 @@ yyreduce:
 	free(column_name);
 
 }
-#line 1380 "src/_sgl/parser.tab.c"
+#line 1381 "src/_sgl/parser.tab.c"
     break;
 
   case 25: /* col_expr: UNQUOTED_STRING  */
-#line 214 "src/_sgl/parser.y"
+#line 215 "src/_sgl/parser.y"
                           {
 	enum cta cta=IDENTITY;
 	char *column_name=(yyvsp[0].str);
@@ -1392,11 +1393,11 @@ yyreduce:
 	free(column_name);
 
 }
-#line 1396 "src/_sgl/parser.tab.c"
+#line 1397 "src/_sgl/parser.tab.c"
     break;
 
   case 26: /* fn_arg: INTEGER  */
-#line 226 "src/_sgl/parser.y"
+#line 227 "src/_sgl/parser.y"
                 {
 	int value=(yyvsp[0].int_val);
 
@@ -1406,11 +1407,11 @@ yyreduce:
 
 	(yyval.fa)=new_arg;
 }
-#line 1410 "src/_sgl/parser.tab.c"
+#line 1411 "src/_sgl/parser.tab.c"
     break;
 
   case 31: /* grouping_expr: col_expr  */
-#line 242 "src/_sgl/parser.y"
+#line 243 "src/_sgl/parser.y"
                         {
 	struct grouping_expr *new_grouping_expr = malloc(sizeof(struct grouping_expr));
 
@@ -1419,11 +1420,11 @@ yyreduce:
 
 	cgs->layers->groupings=new_grouping_expr;
 }
-#line 1423 "src/_sgl/parser.tab.c"
+#line 1424 "src/_sgl/parser.tab.c"
     break;
 
   case 36: /* collection_expr: col_expr  */
-#line 257 "src/_sgl/parser.y"
+#line 258 "src/_sgl/parser.y"
                           {
 	struct collection_expr *new_collection_expr = malloc(sizeof(struct collection_expr));
 
@@ -1432,17 +1433,17 @@ yyreduce:
 
 	cgs->layers->collections=new_collection_expr;
 }
-#line 1436 "src/_sgl/parser.tab.c"
+#line 1437 "src/_sgl/parser.tab.c"
     break;
 
   case 37: /* scale_clause: SCALE BY scale_list  */
-#line 266 "src/_sgl/parser.y"
+#line 267 "src/_sgl/parser.y"
                                   {}
-#line 1442 "src/_sgl/parser.tab.c"
+#line 1443 "src/_sgl/parser.tab.c"
     break;
 
   case 40: /* scale_expr: UNQUOTED_STRING '(' UNQUOTED_STRING ')'  */
-#line 271 "src/_sgl/parser.y"
+#line 272 "src/_sgl/parser.y"
                                                     {
 	char *scale_str=(yyvsp[-3].str);
 	str_tolower(scale_str);
@@ -1476,17 +1477,17 @@ yyreduce:
 	new_scale->next=cgs->scales;	
 	cgs->scales=new_scale;
 }
-#line 1480 "src/_sgl/parser.tab.c"
+#line 1481 "src/_sgl/parser.tab.c"
     break;
 
   case 41: /* facet_clause: FACET BY facet_list  */
-#line 305 "src/_sgl/parser.y"
+#line 306 "src/_sgl/parser.y"
                                   {}
-#line 1486 "src/_sgl/parser.tab.c"
+#line 1487 "src/_sgl/parser.tab.c"
     break;
 
   case 44: /* facet_expr: UNQUOTED_STRING direction  */
-#line 310 "src/_sgl/parser.y"
+#line 311 "src/_sgl/parser.y"
                                       {
 	char *column = (yyvsp[-1].str);
 	enum direction facet_direction = (yyvsp[0].direction_enum);
@@ -1500,35 +1501,35 @@ yyreduce:
 	new_facet->next=cgs->facets;
 	cgs->facets=new_facet;	
 }
-#line 1504 "src/_sgl/parser.tab.c"
+#line 1505 "src/_sgl/parser.tab.c"
     break;
 
   case 45: /* direction: %empty  */
-#line 324 "src/_sgl/parser.y"
+#line 325 "src/_sgl/parser.y"
            { (yyval.direction_enum) = DEFAULT_DIRECTION; }
-#line 1510 "src/_sgl/parser.tab.c"
+#line 1511 "src/_sgl/parser.tab.c"
     break;
 
   case 46: /* direction: HORIZONTALLY  */
-#line 325 "src/_sgl/parser.y"
+#line 326 "src/_sgl/parser.y"
                { (yyval.direction_enum) = HORIZONTAL_DIRECTION; }
-#line 1516 "src/_sgl/parser.tab.c"
+#line 1517 "src/_sgl/parser.tab.c"
     break;
 
   case 47: /* direction: VERTICALLY  */
-#line 326 "src/_sgl/parser.y"
+#line 327 "src/_sgl/parser.y"
              { (yyval.direction_enum) = VERTICAL_DIRECTION; }
-#line 1522 "src/_sgl/parser.tab.c"
+#line 1523 "src/_sgl/parser.tab.c"
     break;
 
   case 48: /* title_clause: TITLE title_list  */
-#line 328 "src/_sgl/parser.y"
+#line 329 "src/_sgl/parser.y"
                                {}
-#line 1528 "src/_sgl/parser.tab.c"
+#line 1529 "src/_sgl/parser.tab.c"
     break;
 
   case 51: /* title_expr: UNQUOTED_STRING AS SINGLE_QUOTED_STRING  */
-#line 333 "src/_sgl/parser.y"
+#line 334 "src/_sgl/parser.y"
                                                     {
 	char *aes_str=(yyvsp[-2].str);
 	str_tolower(aes_str);	
@@ -1566,11 +1567,11 @@ yyreduce:
 	new_title->next=cgs->titles;	
 	cgs->titles=new_title;
 }
-#line 1570 "src/_sgl/parser.tab.c"
+#line 1571 "src/_sgl/parser.tab.c"
     break;
 
 
-#line 1574 "src/_sgl/parser.tab.c"
+#line 1575 "src/_sgl/parser.tab.c"
 
       default: break;
     }
@@ -1763,10 +1764,14 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 371 "src/_sgl/parser.y"
+#line 372 "src/_sgl/parser.y"
 
 
 void sgl_to_cgs(const char *sgl_stmt, struct cgs *cgs, char **errmsg) {
+	cgs->layers=NULL;
+	cgs->scales=NULL;
+	cgs->facets=NULL;
+	cgs->titles=NULL;
 	set_scanner_input(sgl_stmt);
 	int parse_result = yyparse(cgs, errmsg);
 	reorder_cmpnts(cgs);

@@ -10,6 +10,7 @@ extern "C" {
 #include "qual.h"
 #include "scale.h"
 #include "direction.h"
+#include "cgs_free.h"
 }
 
 namespace py = pybind11;
@@ -17,430 +18,263 @@ namespace py = pybind11;
 // Mirrors rsgl's sgl_to_rgs.cpp. Where rsgl sets R class attributes
 // (e.g. c("sgl_geom_point", "sgl_geom")), we carry the variant as a string
 // tag under a "class" key; pgs.py reconstructs typed objects from those tags.
+
+std::string pgs_aes_str(enum aes c_aes_enum) {
+	switch(c_aes_enum) {
+		case X:
+				return "x";
+		case Y:
+				return "y";
+		case RADIUS:
+				return "r";
+		case THETA:
+				return "theta";
+		case COLOR:
+				return "color";
+		case SIZE:
+				return "size";
+	}
+	throw std::runtime_error("unexpected aes");
+}
+
+py::dict pgs_col_expr(struct col_expr c_col_expr) {
+	std::string pgs_cta_class;
+	switch(c_col_expr.cta) {
+		case IDENTITY:
+			pgs_cta_class = "sgl_cta_identity";
+			break;
+		case AVG:
+			pgs_cta_class = "sgl_cta_avg";
+			break;
+		case BIN:
+			pgs_cta_class = "sgl_cta_bin";
+			break;
+		case COUNT:
+			pgs_cta_class = "sgl_cta_count";
+			break;
+	}
+	py::dict pgs_cta_obj;
+	pgs_cta_obj["class"] = pgs_cta_class;
+
+	py::dict result;
+	result["column"] = std::string(c_col_expr.column);
+	result["cta"] = pgs_cta_obj;
+	if (c_col_expr.arg != NULL) {
+		result["arg"] = c_col_expr.arg->value;
+	}
+	return result;
+}
+
+py::dict pgs_aes_mappings(struct aes_mapping *c_aes_mappings) {
+	struct aes_mapping *current = c_aes_mappings;
+	py::dict result;
+	std::string aes_name;
+	while (current != NULL) {
+		aes_name = pgs_aes_str(current->aes);
+		result[py::str(aes_name)] = pgs_col_expr(current->col_expr);
+		current = current->next;
+	}
+	return result;
+}
+
+py::list pgs_groupings(struct grouping_expr *c_groupings) {
+	struct grouping_expr *current = c_groupings;
+	py::list result;
+	while (current != NULL) {
+		result.append(
+			pgs_col_expr(current->col_expr)
+		);
+		current = current->next;
+	}
+	return result;
+}
+
+py::list pgs_collections(struct collection_expr *c_collections) {
+	struct collection_expr *current = c_collections;
+	py::list result;
+	while (current != NULL) {
+		result.append(
+			pgs_col_expr(current->col_expr)
+		);
+		current = current->next;
+	}
+	return result;
+}
+
+py::dict pgs_geom_expr(struct geom_expr *c_geom_expr) {
+	std::string pgs_geom_class;
+	switch(c_geom_expr->geom) {
+		case POINT:
+			pgs_geom_class = "sgl_geom_point";
+			break;
+		case BAR:
+			pgs_geom_class = "sgl_geom_bar";
+			break;
+		case LINE:
+			pgs_geom_class = "sgl_geom_line";
+			break;
+		case BOX:
+			pgs_geom_class = "sgl_geom_box";
+			break;
+	}
+	py::dict pgs_geom_obj;
+	pgs_geom_obj["class"] = pgs_geom_class;
+
+	std::string pgs_qual_str;
+	switch(c_geom_expr->qual) {
+		case HORIZONTAL:
+			pgs_qual_str = "horizontal";
+			break;
+		case JITTERED:
+			pgs_qual_str = "jittered";
+			break;
+		case REGRESSION:
+			pgs_qual_str = "regression";
+			break;
+		case UNSTACKED:
+			pgs_qual_str = "unstacked";
+			break;
+		case VERTICAL:
+			pgs_qual_str = "vertical";
+			break;
+		case DEFAULT:
+			pgs_qual_str = "default";
+			break;
+	}
+
+	py::dict result;
+	result["geom"] = pgs_geom_obj;
+	result["qual"] = pgs_qual_str;
+	return result;
+}
+
+py::dict pgs_layer(struct layer *c_layer, struct geom_expr *c_geom_expr) {
+	py::dict result;
+	result["aes_mappings"] = pgs_aes_mappings(c_layer->aes_mappings);
+	result["source_sql_query"] = std::string(c_layer->source_sql_query);
+	result["geom_expr"] = pgs_geom_expr(c_geom_expr);
+	if (c_layer->groupings != NULL) {
+		result["groupings"] = pgs_groupings(c_layer->groupings);
+	}
+	if(c_layer->collections != NULL) {
+		result["collections"] = pgs_collections(c_layer->collections);
+	}
+	return result;
+}
+
+py::dict pgs_scales(struct scale_expr *c_scales) {
+	struct scale_expr *current_scale_expr = c_scales;
+	std::string pgs_scale_class;
+	std::string pgs_aes;
+	py::dict result;
+	while (current_scale_expr != NULL) {
+		py::dict pgs_scale_obj;
+		switch(current_scale_expr->scale) {
+			case LINEAR:
+				pgs_scale_class = "sgl_scale_linear";
+				break;
+			case LN:
+				pgs_scale_class = "sgl_scale_ln";
+				break;
+			case LOG:
+				pgs_scale_class = "sgl_scale_log";
+				break;
+		}
+		pgs_scale_obj["class"] = pgs_scale_class;
+		pgs_aes = pgs_aes_str(current_scale_expr->aes);
+
+		result[py::str(pgs_aes)] = pgs_scale_obj;
+
+		current_scale_expr = current_scale_expr->next;
+	}
+	return result;
+}
+
+py::list pgs_facets(struct facet_expr *c_facets) {
+	std::string column_name;
+	std::string pgs_facet_direction;
+	py::list result;
+	struct facet_expr *current_facet_expr = c_facets;
+	while (current_facet_expr != NULL) {
+		py::dict facet_entry;
+		switch(current_facet_expr->direction) {
+			case DEFAULT_DIRECTION:
+				pgs_facet_direction = "default";
+				break;
+			case HORIZONTAL_DIRECTION:
+				pgs_facet_direction = "horizontal";
+				break;
+			case VERTICAL_DIRECTION:
+				pgs_facet_direction = "vertical";
+				break;
+		}
+		facet_entry["direction"] = pgs_facet_direction;
+		facet_entry["column"] = std::string(current_facet_expr->column);
+
+		result.append(facet_entry);
+
+		current_facet_expr = current_facet_expr->next;
+	}
+	return result;
+}
+
+py::dict pgs_titles(struct title_expr *c_titles) {
+	std::string pgs_aes;
+	py::dict result;
+	struct title_expr *current_title_expr = c_titles;
+	while (current_title_expr != NULL) {
+		pgs_aes = pgs_aes_str(current_title_expr->aes);
+		result[py::str(pgs_aes)] = std::string(current_title_expr->title);
+
+		current_title_expr = current_title_expr->next;
+	}
+	return result;
+}
+
 py::dict sgl_to_pgs(std::string sgl_stmt) {
-    struct cgs cgs;
-		cgs.layers = NULL;
-		cgs.scales = NULL;
-		cgs.facets= NULL;
-		cgs.titles= NULL;
-    char *errmsg = NULL;
-		struct layer *current_layer;
-		struct layer *next_layer;
-		struct scale_expr *current_scale_expr;
-		struct scale_expr *next_scale_expr;
-		struct facet_expr *current_facet_expr;
-		struct facet_expr *next_facet_expr;
-		struct title_expr *current_title_expr;
-		struct title_expr *next_title_expr;
+	struct cgs *cgs = (struct cgs *)malloc(sizeof(struct cgs));
+	char *errmsg = NULL;
 
-    // Call the C parser function
-    sgl_to_cgs(sgl_stmt.c_str(), &cgs, &errmsg);
+	sgl_to_cgs(sgl_stmt.c_str(), cgs, &errmsg);
 
-    // Check for errors
-    if (errmsg != NULL) {
-        std::string error_message(errmsg);
-        free(errmsg);
-        throw std::runtime_error(error_message);
-    }
+	if (errmsg != NULL) {
+		std::string error_message(errmsg);
+		free(errmsg);
+		free_cgs(cgs);
+		throw std::runtime_error(error_message);
+	}
 
-    // Convert C struct to Python dict
- 		py::dict result;
-		py::list layers;
+	py::dict result;
+	py::list layers;
 
-		current_layer = cgs.layers;
-
-		while(current_layer != NULL) {
-			next_layer = current_layer->next;
-			py::dict layer;
-
-			// Add SQL query
-			if (current_layer->source_sql_query != NULL) {
-					layer["source_sql_query"] = std::string(current_layer->source_sql_query);
-			} else {
-					layer["source_sql_query"] = py::none();
-			}
-
-			// Convert aesthetic mappings to Python dict
-			py::dict aes_list;
-			struct aes_mapping *current = current_layer->aes_mappings;
-			while (current != NULL) {
-					std::string aes_name;
-					switch(current->aes) {
-							case X:
-									aes_name = "x";
-									break;
-							case Y:
-									aes_name = "y";
-									break;
-							case RADIUS:
-									aes_name = "r";
-									break;
-							case THETA:
-									aes_name = "theta";
-									break;
-							case COLOR:
-									aes_name = "color";
-									break;
-							case SIZE:
-									aes_name = "size";
-									break;
-							default:
-									aes_name = "unknown";
-					}
-
-					py::dict cta_obj;
-					switch(current->col_expr.cta) {
-							case IDENTITY:
-								cta_obj["class"] = "sgl_cta_identity";
-								break;
-							case AVG:
-								cta_obj["class"] = "sgl_cta_avg";
-								break;
-							case BIN:
-								cta_obj["class"] = "sgl_cta_bin";
-								break;
-							case COUNT:
-								cta_obj["class"] = "sgl_cta_count";
-								break;
-							default:
-								cta_obj["class"] = "sgl_cta";
-					}
-
-					std::string column = std::string(current->col_expr.column);
-					py::dict col_expr;
-					col_expr["column"] = column;
-					col_expr["cta"] = cta_obj;
-					if (current->col_expr.arg != NULL) {
-						col_expr["arg"] = current->col_expr.arg->value;
-					}
-					aes_list[py::str(aes_name)] = col_expr;
-
-					current = current->next;
-			}
-			layer["aes_mappings"] = aes_list;
-
-			// Convert groupings to Python list
-			if(current_layer->groupings != NULL) {
-				py::list grouping_list;
-				struct grouping_expr *current_grouping = current_layer->groupings;
-				while (current_grouping != NULL) {
-						std::string column = std::string(current_grouping->col_expr.column);
-
-						py::dict cta_obj;
-						switch(current_grouping->col_expr.cta) {
-								case IDENTITY:
-									cta_obj["class"] = "sgl_cta_identity";
-									break;
-								case AVG:
-									cta_obj["class"] = "sgl_cta_avg";
-									break;
-								case BIN:
-									cta_obj["class"] = "sgl_cta_bin";
-									break;
-								case COUNT:
-									cta_obj["class"] = "sgl_cta_count";
-									break;
-								default:
-									cta_obj["class"] = "sgl_cta";
-						}
-
-						py::dict col_expr;
-						col_expr["column"] = column;
-						col_expr["cta"] = cta_obj;
-						if (current_grouping->col_expr.arg != NULL) {
-							col_expr["arg"] = current_grouping->col_expr.arg->value;
-						}
-
-						grouping_list.append(col_expr);
-
-						current_grouping = current_grouping->next;
-				}
-				layer["groupings"] = grouping_list;
-			}
-
-			// Convert collections to Python list
-			if(current_layer->collections != NULL) {
-				py::list collection_list;
-				struct collection_expr *current_collection = current_layer->collections;
-				while (current_collection != NULL) {
-						std::string column = std::string(current_collection->col_expr.column);
-
-						py::dict cta_obj;
-						switch(current_collection->col_expr.cta) {
-							case IDENTITY:
-								cta_obj["class"] = "sgl_cta_identity";
-								break;
-							case AVG:
-								cta_obj["class"] = "sgl_cta_avg";
-								break;
-							case BIN:
-								cta_obj["class"] = "sgl_cta_bin";
-								break;
-							case COUNT:
-								cta_obj["class"] = "sgl_cta_count";
-								break;
-							default:
-								cta_obj["class"] = "sgl_cta";
-						}
-
-						py::dict col_expr;
-						col_expr["column"] = column;
-						col_expr["cta"] = cta_obj;
-						if (current_collection->col_expr.arg != NULL) {
-							col_expr["arg"] = current_collection->col_expr.arg->value;
-						}
-
-						collection_list.append(col_expr);
-
-						current_collection = current_collection->next;
-				}
-				layer["collections"] = collection_list;
-			}
-
-			// Convert geoms to geom list
-			py::list geom_list;
-			struct geom_expr *current_geom_expr = current_layer->geoms;
-			while(current_geom_expr != NULL) {
-				py::dict geom_obj;
-				enum geom geom_enum = current_geom_expr->geom;
-				switch(geom_enum) {
-						case POINT:
-								geom_obj["class"] = "sgl_geom_point";
-								break;
-						case BAR:
-								geom_obj["class"] = "sgl_geom_bar";
-								break;
-						case LINE:
-								geom_obj["class"] = "sgl_geom_line";
-								break;
-						case BOX:
-								geom_obj["class"] = "sgl_geom_box";
-								break;
-						default:
-								geom_obj["class"] = "sgl_geom";
-				}
-
-				// Convert qual enum
-				enum qual qual_enum = current_geom_expr->qual;
-				std::string qual_str;
-				switch(qual_enum) {
-						case HORIZONTAL:
-							qual_str = "horizontal";
-							break;
-						case JITTERED:
-							qual_str = "jittered";
-							break;
-						case REGRESSION:
-							qual_str = "regression";
-							break;
-						case UNSTACKED:
-							qual_str = "unstacked";
-							break;
-						case VERTICAL:
-							qual_str = "vertical";
-							break;
-						case DEFAULT:
-							qual_str = "default";
-							break;
-						default:
-							qual_str = "unknown";
-				}
-
-				py::dict geom_expr;
-				// Add geom_expr
-				geom_expr["qual"] = qual_str;
-				geom_expr["geom"] = geom_obj;
-				geom_list.append(geom_expr);
-				current_geom_expr = current_geom_expr->next;
-			}
-
-			// Add layer for each geom expr
-			for (size_t i = 0; i < geom_list.size(); i++) {
-				layer["geom_expr"] = geom_list[i];
-				layers.append(py::reinterpret_steal<py::dict>(PyDict_Copy(layer.ptr())));
-			}
-
-			// Clean up allocated memory
-			if (current_layer->source_sql_query != NULL) {
-					free(current_layer->source_sql_query);
-			}
-
-			// Free the linked list of aes_mappings
-			current = current_layer->aes_mappings;
-			while (current != NULL) {
-					struct aes_mapping *next = current->next;
-					free(current->col_expr.column);
-					free(current->col_expr.arg);
-					free(current);
-					current = next;
-			}
-
-			// Free the linked list of geoms
-			struct geom_expr *current_geom = current_layer->geoms;
-			struct geom_expr *next_geom;
-			while (current_geom != NULL) {
-					next_geom = current_geom->next;
-					free(current_geom);
-					current_geom = next_geom;
-			}
-
-			// Free the linked list of groupings
-			struct grouping_expr *current_grouping = current_layer->groupings;
-			struct grouping_expr *next_grouping;
-			while (current_grouping != NULL) {
-					next_grouping = current_grouping->next;
-					free(current_grouping->col_expr.column);
-					free(current_grouping->col_expr.arg);
-					free(current_grouping);
-					current_grouping = next_grouping;
-			}
-
-			// Free the linked list of collections
-			struct collection_expr *current_collection = current_layer->collections;
-			struct collection_expr *next_collection;
-			while (current_collection != NULL) {
-					next_collection = current_collection->next;
-					free(current_collection->col_expr.column);
-					free(current_collection->col_expr.arg);
-					free(current_collection);
-					current_collection = next_collection;
-			}
-
-			free(current_layer);
-			current_layer = next_layer;
+	struct layer *current_layer = cgs->layers;
+	struct geom_expr *current_geom_expr;
+	while(current_layer != NULL) {
+		current_geom_expr = current_layer->geoms;
+		while(current_geom_expr != NULL) {
+			layers.append(pgs_layer(current_layer, current_geom_expr));
+			current_geom_expr = current_geom_expr->next;
 		}
+		current_layer = current_layer->next;
+	}
 
-		result["layers"] = layers;
+	result["layers"] = layers;
 
-		if (cgs.scales != NULL) {
-			py::dict scale_list;
-			current_scale_expr = cgs.scales;
-			while (current_scale_expr != NULL) {
-				next_scale_expr = current_scale_expr->next;
+	if (cgs->scales != NULL) {
+		result["scales"] = pgs_scales(cgs->scales);
+	}
 
-				py::dict scale_obj;
-				switch(current_scale_expr->scale) {
-						case LINEAR:
-								scale_obj["class"] = "sgl_scale_linear";
-								break;
-						case LN:
-								scale_obj["class"] = "sgl_scale_ln";
-								break;
-						case LOG:
-								scale_obj["class"] = "sgl_scale_log";
-								break;
-						default:
-								scale_obj["class"] = "sgl_scale";
-				}
+	if (cgs->facets != NULL) {
+		result["facets"] = pgs_facets(cgs->facets);
+	}
 
-				std::string scale_aes;
-				switch(current_scale_expr->aes) {
-						case X:
-								scale_aes = "x";
-								break;
-						case Y:
-								scale_aes = "y";
-								break;
-						case RADIUS:
-								scale_aes = "r";
-								break;
-						case THETA:
-								scale_aes = "theta";
-								break;
-						case COLOR:
-								scale_aes = "color";
-								break;
-						case SIZE:
-								scale_aes = "size";
-								break;
-						default:
-								scale_aes = "unknown";
-				}
+	if (cgs->titles != NULL) {
+		result["titles"] = pgs_titles(cgs->titles);
+	}
 
-				scale_list[py::str(scale_aes)] = scale_obj;
+	free_cgs(cgs);
 
-				free(current_scale_expr);
-				current_scale_expr = next_scale_expr;
-			}
-			result["scales"] = scale_list;
-		}
-
-		if (cgs.facets != NULL) {
-			py::list facet_list;
-			current_facet_expr = cgs.facets;
-			while (current_facet_expr != NULL) {
-				next_facet_expr = current_facet_expr->next;
-
-				py::dict facet_entry;
-				std::string column_name = current_facet_expr->column;
-				std::string facet_direction;
-				switch(current_facet_expr->direction) {
-						case DEFAULT_DIRECTION:
-								facet_direction = "default";
-								break;
-						case HORIZONTAL_DIRECTION:
-								facet_direction = "horizontal";
-								break;
-						case VERTICAL_DIRECTION:
-								facet_direction = "vertical";
-								break;
-						default:
-								facet_direction = "unknown";
-				}
-
-				facet_entry["column"] = column_name;
-				facet_entry["direction"] = facet_direction;
-
-				facet_list.append(facet_entry);
-
-				free(current_facet_expr->column);
-				free(current_facet_expr);
-				current_facet_expr = next_facet_expr;
-			}
-			result["facets"] = facet_list;
-		}
-
-		if (cgs.titles != NULL) {
-			py::dict title_list;
-			current_title_expr = cgs.titles;
-			while (current_title_expr != NULL) {
-				next_title_expr = current_title_expr->next;
-
-				std::string title_aes;
-				switch(current_title_expr->aes) {
-						case X:
-								title_aes = "x";
-								break;
-						case Y:
-								title_aes = "y";
-								break;
-						case RADIUS:
-								title_aes = "r";
-								break;
-						case THETA:
-								title_aes = "theta";
-								break;
-						case COLOR:
-								title_aes = "color";
-								break;
-						case SIZE:
-								title_aes = "size";
-								break;
-						default:
-								title_aes = "unknown";
-				}
-
-				std::string title = current_title_expr->title;
-				title_list[py::str(title_aes)] = title;
-
-				free(current_title_expr->title);
-				free(current_title_expr);
-				current_title_expr = next_title_expr;
-			}
-			result["titles"] = title_list;
-		}
-
-    return result;
+	return result;
 }
 
 PYBIND11_MODULE(_sgl, m) {

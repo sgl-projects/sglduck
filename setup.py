@@ -52,6 +52,7 @@ _SGL_SOURCES = [
     "src/_sgl/title.c",
     "src/_sgl/case.c",
     "src/_sgl/cgs_order.c",
+    "src/_sgl/cgs_free.c",
 ]
 
 _define_macros = []

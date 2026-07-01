@@ -6,6 +6,7 @@
 #include<cta.h>
 #include<qual.h>
 #include<direction.h>
+#include<cgs_free.h>
 #include<sgl_to_cgs.h>
 
 static struct cgs *cgs;
@@ -13,90 +14,11 @@ static char *errmsg;
 
 static void setup_test_sgl_to_cgs(void) {
 	cgs = malloc(sizeof(struct cgs));
-	cgs->layers=NULL;
-	cgs->scales=NULL;
-	cgs->facets=NULL;
-	cgs->titles=NULL;
 	errmsg = NULL;
 }
 
 static void teardown_test_sgl_to_cgs(void) {
-	struct layer *current_layer = cgs->layers;
-	struct layer *next_layer;
-	struct aes_mapping *current_mapping;
-	struct aes_mapping *next_mapping;
-	struct geom_expr *current_geom;
-	struct geom_expr *next_geom;
-	struct grouping_expr *current_grouping;
-	struct grouping_expr *next_grouping;
-	struct collection_expr *current_collection;
-	struct collection_expr *next_collection;
-
-	while(current_layer != NULL) {
-		next_layer = current_layer->next;
-		free(current_layer->source_sql_query);
-		current_mapping = current_layer->aes_mappings;
-		while(current_mapping != NULL) {
-			next_mapping = current_mapping->next;
-			free(current_mapping->col_expr.column);
-			free(current_mapping->col_expr.arg);
-			free(current_mapping);
-			current_mapping = next_mapping;
-		}
-		current_geom = current_layer->geoms;
-		while(current_geom != NULL) {
-			next_geom = current_geom->next;
-			free(current_geom);
-			current_geom = next_geom;
-		}
-		current_grouping = current_layer->groupings;
-		while(current_grouping != NULL) {
-			next_grouping = current_grouping->next;
-			free(current_grouping->col_expr.column);
-			free(current_grouping->col_expr.arg);
-			free(current_grouping);
-			current_grouping = next_grouping;
-		}
-		current_collection = current_layer->collections;
-		while(current_collection != NULL) {
-			next_collection = current_collection->next;
-			free(current_collection->col_expr.column);
-			free(current_collection->col_expr.arg);
-			free(current_collection);
-			current_collection = next_collection;
-		}
-
-		free(current_layer);
-		current_layer = next_layer;
-	}
-
-	struct scale_expr *current_scale_expr = cgs->scales;
-	struct scale_expr *next_scale_expr;
-	while(current_scale_expr != NULL) {
-		next_scale_expr = current_scale_expr->next;
-		free(current_scale_expr);
-		current_scale_expr = next_scale_expr;
-	}
-
-	struct facet_expr *current_facet_expr = cgs->facets;
-	struct facet_expr *next_facet_expr;
-	while(current_facet_expr != NULL) {
-		next_facet_expr = current_facet_expr->next;
-		free(current_facet_expr->column);
-		free(current_facet_expr);
-		current_facet_expr = next_facet_expr;
-	}
-
-	struct title_expr *current_title_expr = cgs->titles;
-	struct title_expr *next_title_expr;
-	while(current_title_expr != NULL) {
-		next_title_expr = current_title_expr->next;
-		free(current_title_expr->title);
-		free(current_title_expr);
-		current_title_expr = next_title_expr;
-	}
-
-	free(cgs);
+	free_cgs(cgs);
 	free(errmsg);
 }
 
