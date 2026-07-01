@@ -16,7 +16,7 @@ TEST_LDFLAGS := $(shell pkg-config --libs criterion)
 SRC = src/_sgl
 TEST = tests/_sgl
 
-SRC_OBJS = $(SRC)/parser.tab.o $(SRC)/scanner.o $(SRC)/aes.o $(SRC)/geom.o $(SRC)/cta.o $(SRC)/qual.o $(SRC)/scale.o $(SRC)/keyword.o $(SRC)/title.o $(SRC)/case.o $(SRC)/cgs_order.o
+SRC_OBJS = $(SRC)/parser.tab.o $(SRC)/scanner.o $(SRC)/aes.o $(SRC)/geom.o $(SRC)/cta.o $(SRC)/qual.o $(SRC)/scale.o $(SRC)/keyword.o $(SRC)/title.o $(SRC)/case.o $(SRC)/cgs_order.o $(SRC)/cgs_free.o
 TEST_OBJS = $(TEST)/test_sgl_to_cgs.o $(TEST)/test_aes.o $(TEST)/test_geom.o $(TEST)/test_cta.o $(TEST)/test_qual.o $(TEST)/test_scale.o $(TEST)/test_keyword.o $(TEST)/test_title.o $(TEST)/test_case.o $(TEST)/test_cgs_order.o $(TEST)/stubs.o
 
 # Regenerate parser + scanner, then build the package in editable mode.
@@ -38,7 +38,7 @@ scanner:
 $(SRC)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -o $@ -c $< -I./$(SRC)
 
-$(TEST)/test_sgl_to_cgs.o: $(TEST)/test_sgl_to_cgs.c $(SRC)/aes.h $(SRC)/direction.h $(SRC)/qual.h $(SRC)/sgl_to_cgs.h
+$(TEST)/test_sgl_to_cgs.o: $(TEST)/test_sgl_to_cgs.c $(SRC)/aes.h $(SRC)/direction.h $(SRC)/qual.h $(SRC)/cgs_free.h $(SRC)/sgl_to_cgs.h
 	$(CC) $(CFLAGS) $(CRITERION_CFLAGS) -o $(TEST)/test_sgl_to_cgs.o -c $(TEST)/test_sgl_to_cgs.c -I./$(SRC)
 
 $(TEST)/test_aes.o: $(TEST)/test_aes.c $(SRC)/aes.h $(SRC)/keyword.h $(SRC)/array.h

@@ -63,6 +63,7 @@ layer_list: layer_expression |
 layer_expression: VISUALIZE {
 	struct layer *new_layer = malloc(sizeof(struct layer));
 	new_layer->aes_mappings=NULL;
+	new_layer->source_sql_query=NULL;
 	new_layer->geoms=NULL;
 	new_layer->groupings=NULL;
 	new_layer->collections=NULL;
@@ -371,6 +372,10 @@ title_expr: UNQUOTED_STRING AS SINGLE_QUOTED_STRING {
 %%
 
 void sgl_to_cgs(const char *sgl_stmt, struct cgs *cgs, char **errmsg) {
+	cgs->layers=NULL;
+	cgs->scales=NULL;
+	cgs->facets=NULL;
+	cgs->titles=NULL;
 	set_scanner_input(sgl_stmt);
 	int parse_result = yyparse(cgs, errmsg);
 	reorder_cmpnts(cgs);
